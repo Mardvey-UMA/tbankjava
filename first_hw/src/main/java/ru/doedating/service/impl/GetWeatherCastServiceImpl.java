@@ -22,7 +22,7 @@ public class GetWeatherCastServiceImpl implements GetWeatherCastService {
             throw new EmptyCityException();
         }
 
-        if (!city.matches("[a-zA-Zа-яА-ЯёЁ]+")){
+        if (!city.matches("[а-яА-ЯёЁ]+")){
             throw new InvalidCityException();
         }
 
