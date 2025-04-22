@@ -1,5 +1,5 @@
 package ru.doedating.service.interfaces;
 
-public interface GenerateRandomCast {
+public interface CastGeneratorService {
     String generateRandomCastByCity(String city);
 }
