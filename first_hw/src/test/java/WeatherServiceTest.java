@@ -9,6 +9,7 @@ import ru.doedating.service.interfaces.CastGeneratorService;
 import ru.doedating.service.interfaces.WeatherCastService;
 
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,9 +24,10 @@ public class WeatherServiceTest {
         String city = "Обнинск";
 
         String wCast = weatherService.generateRandomWeatherCast(city);
-        assertTrue(wCast.matches("^Прогноз погоды для города " + city + " на \\d{2}\\.\\d{2}\\.\\d{4} " +
-                "\nТемпература \\d+\\.\\d{2} C " +
-                "\nВлажность \\d+\\.\\d{2} %$"));
+        String pattern = "^Прогноз погоды для города " + Pattern.quote(city) + " на \\d{2}\\.\\d{2}\\.\\d{4}" +
+                "\\s*\\n\\s*Температура (-?\\d+\\.\\d{2}) C" +
+                "\\s*\\n\\s*Влажность \\d+\\.\\d{2} %\\s*$";
+        assertTrue(wCast.matches(pattern));
     }
 
     @Test
