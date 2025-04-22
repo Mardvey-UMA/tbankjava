@@ -2,7 +2,7 @@ name: Weather Cast Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
     branches: [ "main" ]
 
@@ -16,7 +16,7 @@ jobs:
       - name: Set up
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
