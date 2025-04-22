@@ -21,4 +21,5 @@ jobs:
         cache: 'maven'
     
     - name: Run tests
-      run: mvn test -f ./pom.xml
+      working-directory: ./first_hw
+      run: mvn test
