@@ -1,16 +1,13 @@
 package ru.doedating;
 
-import lombok.RequiredArgsConstructor;
 import ru.doedating.exceptions.EmptyCityException;
 import ru.doedating.exceptions.InvalidCityException;
-import ru.doedating.service.impl.GenerateRandomCastImpl;
-import ru.doedating.service.impl.GetWeatherCastServiceImpl;
-import ru.doedating.service.interfaces.GenerateRandomCast;
-import ru.doedating.service.interfaces.GetWeatherCastService;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
+import ru.doedating.repository.WeatherCastRepository;
+import ru.doedating.repository.WeatherCastRepositoryImpl;
+import ru.doedating.service.impl.CastGeneratorServiceImpl;
+import ru.doedating.service.impl.WeatherCastServiceImpl;
+import ru.doedating.service.interfaces.CastGeneratorService;
+import ru.doedating.service.interfaces.WeatherCastService;
 import java.util.Scanner;
 
 public class Main {
@@ -19,10 +16,9 @@ public class Main {
 
     public static void main(String[] args) throws EmptyCityException, InvalidCityException {
 
-        GenerateRandomCast generator = new GenerateRandomCastImpl();
-        GetWeatherCastService weatherService = new GetWeatherCastServiceImpl(generator);
-
-        HashMap<String, String> weatherCache = new HashMap<>();
+        CastGeneratorService generator = new CastGeneratorServiceImpl();
+        WeatherCastRepository repository = new WeatherCastRepositoryImpl();
+        WeatherCastService weatherService = new WeatherCastServiceImpl(generator, repository);
 
         while (true) {
             System.out.println("Введите город или 0 для выхода:");
@@ -31,7 +27,7 @@ public class Main {
                 System.out.println("Досвидания ^^");
                 break;
             }
-            System.out.println(weatherService.generateRandomWeatherCast(city, weatherCache));
+            System.out.println(weatherService.generateRandomWeatherCast(city));
         }
 
     }

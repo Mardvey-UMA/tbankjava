@@ -1,19 +1,19 @@
 package ru.doedating.service.impl;
 
-import ru.doedating.service.interfaces.GenerateRandomCast;
+import ru.doedating.service.interfaces.CastGeneratorService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-public class GenerateRandomCastImpl implements GenerateRandomCast {
+public class CastGeneratorServiceImpl implements CastGeneratorService {
 
     private final Random random = new Random();
     @Override
     public String generateRandomCastByCity(String city) {
 
         Date now = new Date();
-        String dateStr = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(now);
+        String dateStr = new SimpleDateFormat("dd.MM.yyyy").format(now);
 
         int MIN_TEMPERATURE = -30;
         int MAX_TEMPERATURE = 30;
