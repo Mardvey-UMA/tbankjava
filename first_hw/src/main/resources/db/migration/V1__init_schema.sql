@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS public.weather_cast (
     weather_cast_id BIGINT PRIMARY KEY,
     temperature DECIMAL,
     humidity DECIMAL,
-    wind_speed DECIMAL
+    wind_speed DECIMAL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS public.city (
