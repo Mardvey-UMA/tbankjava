@@ -1,27 +1,25 @@
 
-CREATE TABLE IF NOT EXISTS public.weather_cast (
-    weather_cast_id BIGINT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS public.weather (
+    id BIGSERIAL PRIMARY KEY,
     temperature DECIMAL,
     humidity DECIMAL,
     wind_speed DECIMAL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+    );
 
 CREATE TABLE IF NOT EXISTS public.city (
-    city_id BIGINT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
     longitude DECIMAL,
     latitude DECIMAL
-);
+    );
 
-CREATE TABLE IF NOT EXISTS public.cast_city (
-    cast_city_id BIGINT PRIMARY KEY,
-    "date" DATE,
-    weather_cast_id_weather_cast BIGINT NOT NULL,
-    city_id_city BIGINT NOT NULL,
-        CONSTRAINT weather_cast_fk FOREIGN KEY (weather_cast_id_weather_cast)
-        REFERENCES public.weather_cast (weather_cast_id)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-        CONSTRAINT city_fk FOREIGN KEY (city_id_city)
-        REFERENCES public.city (city_id)
-        ON UPDATE CASCADE ON DELETE RESTRICT
+CREATE TABLE IF NOT EXISTS public.city_weather (
+    id BIGSERIAL PRIMARY KEY,
+    date DATE,
+    weather_id BIGINT NOT NULL,
+    city_id BIGINT NOT NULL,
+    CONSTRAINT fk_weather FOREIGN KEY (weather_id) REFERENCES public.weather(id),
+    CONSTRAINT fk_city FOREIGN KEY (city_id) REFERENCES public.city(id),
+    CONSTRAINT unique_city_date UNIQUE (city_id, date)
     );

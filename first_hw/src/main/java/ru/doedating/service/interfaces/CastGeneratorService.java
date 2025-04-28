@@ -1,5 +1,7 @@
 package ru.doedating.service.interfaces;
 
+import ru.doedating.dto.CastGeneratorDTO;
+
 public interface CastGeneratorService {
-    String generateRandomCastByCity(String city);
+    CastGeneratorDTO generateRandomCast();
 }
