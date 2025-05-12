@@ -1,9 +1,7 @@
 package ru.doedating.service.interfaces;
-
-import org.antlr.v4.runtime.misc.Pair;
-
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface CoordinatesService {
-    Pair<BigDecimal, BigDecimal> getCoordinatesByCityName(String cityName);
+    List<BigDecimal> getCoordinatesByCityName(String cityName);
 }

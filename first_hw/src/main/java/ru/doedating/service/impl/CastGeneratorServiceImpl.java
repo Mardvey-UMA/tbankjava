@@ -1,5 +1,6 @@
 package ru.doedating.service.impl;
 
+import org.springframework.stereotype.Service;
 import ru.doedating.dto.CastGeneratorDTO;
 import ru.doedating.service.interfaces.CastGeneratorService;
 
@@ -8,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+@Service
 public class CastGeneratorServiceImpl implements CastGeneratorService {
 
     private final Random random = new Random();
