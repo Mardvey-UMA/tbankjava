@@ -1,8 +1,10 @@
 package ru.doedating.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.doedating.entity.CityEntity;
 
-public interface CityRepository {
-    CityEntity save(CityEntity city);
-    CityEntity findByName(String name);
+import java.util.Optional;
+
+public interface CityRepository extends JpaRepository<CityEntity, Long> {
+    Optional<CityEntity> findByName(String name);
 }

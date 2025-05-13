@@ -1,33 +1,22 @@
 package ru.doedating.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 
-
+@Entity
 @Getter
 @Setter
 @Builder
-@RequiredArgsConstructor
+@Table(name = "city")
+@NoArgsConstructor
+@AllArgsConstructor
 public class CityEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private BigDecimal latitude;
     private BigDecimal longitude;
-
-    public CityEntity(String city, BigDecimal latitude, BigDecimal longitude) {
-        this.name = city;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public CityEntity(long id, String name, BigDecimal latitude, BigDecimal longitude) {
-        this.id = id;
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 }

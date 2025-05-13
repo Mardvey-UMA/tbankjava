@@ -1,10 +1,9 @@
 package ru.doedating.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.doedating.entity.WeatherCastEntity;
 
 import java.util.List;
 
-public interface WeatherCastRepository {
-    WeatherCastEntity save(WeatherCastEntity weatherCastEntity);
-    WeatherCastEntity findByCityAndDate(String city, String date);
+public interface WeatherCastRepository extends JpaRepository<WeatherCastEntity, Long> {
 }

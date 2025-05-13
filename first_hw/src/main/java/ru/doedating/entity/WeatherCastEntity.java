@@ -1,32 +1,23 @@
 package ru.doedating.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
-
+@Entity
 @Getter
 @Setter
 @Builder
-@RequiredArgsConstructor
+@Table(name = "weather")
+@NoArgsConstructor
+@AllArgsConstructor
 public class WeatherCastEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal temperature;
     private BigDecimal humidity;
+
+    @Column(name = "wind_speed")
     private BigDecimal windSpeed;
-
-    public WeatherCastEntity(BigDecimal temperature, BigDecimal humidity, BigDecimal windSpeed) {
-        this.temperature = temperature;
-        this.humidity = humidity;
-        this.windSpeed = windSpeed;
-    }
-
-    public WeatherCastEntity(long id, BigDecimal temperature, BigDecimal humidity, BigDecimal windSpeed) {
-        this.id = id;
-        this.temperature = temperature;
-        this.humidity = humidity;
-        this.windSpeed = windSpeed;
-    }
 }
