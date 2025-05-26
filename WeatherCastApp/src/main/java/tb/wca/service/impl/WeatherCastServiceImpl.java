@@ -1,22 +1,22 @@
-package ru.doedating.service.impl;
+package tb.wca.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.doedating.dto.CastGeneratorDTO;
-import ru.doedating.dto.WeatherCastDTO;
-import ru.doedating.entity.CityEntity;
-import ru.doedating.entity.CityWeatherEntity;
-import ru.doedating.entity.WeatherCastEntity;
-import ru.doedating.exceptions.EmptyCityException;
-import ru.doedating.exceptions.InvalidCityException;
-import ru.doedating.mapper.WeatherCastMapper;
-import ru.doedating.repository.CityWeatherRepository;
-import ru.doedating.repository.CityRepository;
-import ru.doedating.service.interfaces.CastGeneratorService;
-import ru.doedating.service.interfaces.CoordinatesService;
-import ru.doedating.service.interfaces.WeatherCastService;
-import ru.doedating.repository.WeatherCastRepository;
+import tb.wca.dto.CastGeneratorDTO;
+import tb.wca.dto.WeatherCastDTO;
+import tb.wca.entity.CityEntity;
+import tb.wca.entity.CityWeatherEntity;
+import tb.wca.entity.WeatherCastEntity;
+import tb.wca.exceptions.EmptyCityException;
+import tb.wca.exceptions.InvalidCityException;
+import tb.wca.mapper.WeatherCastMapper;
+import tb.wca.repository.CityWeatherRepository;
+import tb.wca.repository.CityRepository;
+import tb.wca.service.interfaces.CastGeneratorService;
+import tb.wca.service.interfaces.CoordinatesService;
+import tb.wca.service.interfaces.WeatherCastService;
+import tb.wca.repository.WeatherCastRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

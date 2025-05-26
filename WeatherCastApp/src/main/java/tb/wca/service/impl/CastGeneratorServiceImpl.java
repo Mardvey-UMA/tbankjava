@@ -1,8 +1,8 @@
-package ru.doedating.service.impl;
+package tb.wca.service.impl;
 
 import org.springframework.stereotype.Service;
-import ru.doedating.dto.CastGeneratorDTO;
-import ru.doedating.service.interfaces.CastGeneratorService;
+import tb.wca.dto.CastGeneratorDTO;
+import tb.wca.service.interfaces.CastGeneratorService;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;

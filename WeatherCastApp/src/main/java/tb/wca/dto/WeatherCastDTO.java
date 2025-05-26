@@ -1,4 +1,4 @@
-package ru.doedating.dto;
+package tb.wca.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

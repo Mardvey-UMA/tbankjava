@@ -1,7 +1,7 @@
-package ru.doedating.service.impl;
+package tb.wca.service.impl;
 
 import org.springframework.stereotype.Service;
-import ru.doedating.service.interfaces.CoordinatesService;
+import tb.wca.service.interfaces.CoordinatesService;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package ru.doedating.exceptions;
+package tb.wca.exceptions;
 
 public class EmptyCityException extends Exception {
 

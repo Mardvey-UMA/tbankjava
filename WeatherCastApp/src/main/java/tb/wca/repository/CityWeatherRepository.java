@@ -1,12 +1,12 @@
-package ru.doedating.repository;
+package tb.wca.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.doedating.entity.CityEntity;
-import ru.doedating.entity.CityWeatherEntity;
-import ru.doedating.entity.WeatherCastEntity;
-import ru.doedating.exceptions.InvalidCityException;
+import tb.wca.entity.CityEntity;
+import tb.wca.entity.CityWeatherEntity;
+import tb.wca.entity.WeatherCastEntity;
+import tb.wca.exceptions.InvalidCityException;
 
 import java.time.LocalDate;
 import java.util.Optional;

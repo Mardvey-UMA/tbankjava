@@ -1,13 +1,13 @@
-package ru.doedating;
+package tb.wca;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ru.doedating.dto.WeatherCastDTO;
-import ru.doedating.exceptions.EmptyCityException;
-import ru.doedating.exceptions.InvalidCityException;
-import ru.doedating.service.interfaces.WeatherCastService;
+import tb.wca.dto.WeatherCastDTO;
+import tb.wca.exceptions.EmptyCityException;
+import tb.wca.exceptions.InvalidCityException;
+import tb.wca.service.interfaces.WeatherCastService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

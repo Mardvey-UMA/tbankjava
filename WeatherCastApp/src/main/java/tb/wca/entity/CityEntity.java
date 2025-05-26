@@ -1,23 +1,22 @@
-package ru.doedating.entity;
+package tb.wca.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
 @Builder
-@Table(name = "weather")
+@Table(name = "city")
 @NoArgsConstructor
 @AllArgsConstructor
-public class WeatherCastEntity {
+public class CityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private BigDecimal temperature;
-    private BigDecimal humidity;
-
-    @Column(name = "wind_speed")
-    private BigDecimal windSpeed;
+    private String name;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 }

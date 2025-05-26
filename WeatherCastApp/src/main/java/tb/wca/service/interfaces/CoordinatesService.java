@@ -1,4 +1,4 @@
-package ru.doedating.service.interfaces;
+package tb.wca.service.interfaces;
 import java.math.BigDecimal;
 import java.util.List;
 

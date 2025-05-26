@@ -1,6 +1,6 @@
-package ru.doedating.service.interfaces;
+package tb.wca.service.interfaces;
 
-import ru.doedating.dto.CastGeneratorDTO;
+import tb.wca.dto.CastGeneratorDTO;
 
 public interface CastGeneratorService {
     CastGeneratorDTO generateRandomCast();

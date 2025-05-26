@@ -1,4 +1,4 @@
-package ru.doedating.entity;
+package tb.wca.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

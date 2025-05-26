@@ -1,8 +1,8 @@
-package ru.doedating.mapper;
+package tb.wca.mapper;
 
-import ru.doedating.dto.WeatherCastDTO;
-import ru.doedating.entity.CityEntity;
-import ru.doedating.entity.WeatherCastEntity;
+import tb.wca.dto.WeatherCastDTO;
+import tb.wca.entity.CityEntity;
+import tb.wca.entity.WeatherCastEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

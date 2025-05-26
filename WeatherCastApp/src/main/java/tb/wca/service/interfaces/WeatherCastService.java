@@ -1,8 +1,8 @@
-package ru.doedating.service.interfaces;
+package tb.wca.service.interfaces;
 
-import ru.doedating.dto.WeatherCastDTO;
-import ru.doedating.exceptions.EmptyCityException;
-import ru.doedating.exceptions.InvalidCityException;
+import tb.wca.dto.WeatherCastDTO;
+import tb.wca.exceptions.EmptyCityException;
+import tb.wca.exceptions.InvalidCityException;
 
 import java.time.LocalDate;
 import java.util.HashMap;

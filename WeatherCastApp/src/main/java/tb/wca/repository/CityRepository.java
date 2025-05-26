@@ -1,7 +1,7 @@
-package ru.doedating.repository;
+package tb.wca.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.doedating.entity.CityEntity;
+import tb.wca.entity.CityEntity;
 
 import java.util.Optional;
 
