@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tb.wca.client.config.YandexClientConfig;
+import tb.wca.client.dto.YandexGeoResponse;
 import tb.wca.model.CityGeoModel;
 
 @FeignClient(
@@ -14,5 +15,5 @@ public interface YandexGeocodeClient {
 
     @GetMapping
     CityGeoModel geocode(@RequestParam("geocode") String city,
-                         @RequestParam("format")  String format);
+                              @RequestParam("format")  String format);
 }

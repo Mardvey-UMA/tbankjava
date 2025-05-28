@@ -1,16 +1,13 @@
 package tb.wca.client.decoder;
 
-import feign.FeignException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
-import feign.codec.DecodeException;
 import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import lombok.RequiredArgsConstructor;
 import tb.wca.client.dto.WeatherProjectEolResponse;
-import tb.wca.client.dto.YandexGeoResponse;
 import tb.wca.client.mapper.WeatherProjectEolMapper;
 import tb.wca.exceptions.NotFoundDataException;
-import tb.wca.model.WeatherModel;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -24,13 +21,25 @@ public class WeatherProjectEolDecoder implements Decoder {
 
     @Override
     public Object decode(Response response, Type type) throws IOException {
-        Object decoded = jacksonDecoder.decode(response, type);
-        if (decoded instanceof List<?> list) {
-            if (!list.isEmpty() && list.get(0) instanceof WeatherProjectEolResponse) {
-                List<WeatherProjectEolResponse> dtoList = (List<WeatherProjectEolResponse>) list;
-                return weatherProjectEolMapper.toDto(dtoList);
-            }
+        Object decoded = jacksonDecoder.decode(response, List.class);
+
+        List<?> responseList = (List<?>) decoded;
+
+        if (responseList.size() == 1 && responseList.get(0) instanceof String) {
+            throw new NotFoundDataException();
         }
-        throw new NotFoundDataException();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        return responseList.stream()
+                .map(item -> {
+                        return weatherProjectEolMapper.toDto(
+                                mapper.convertValue(
+                                        item,
+                                        WeatherProjectEolResponse.class)
+                        );
+                })
+                .toList();
     }
 }
+

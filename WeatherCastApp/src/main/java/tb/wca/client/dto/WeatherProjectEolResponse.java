@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record WeatherProjectEolResponse(
         @JsonProperty("dt_forecast") String dtForecast,
-        // TODO (ДОБАВИТЬ ДЕНЬ И ЧАС)
         @JsonProperty("temp_2_cel")  Double temp,
         @JsonProperty("temp_feels_cel") Double feelsLike,
         @JsonProperty("wind_speed_10")  Double windSpeed,

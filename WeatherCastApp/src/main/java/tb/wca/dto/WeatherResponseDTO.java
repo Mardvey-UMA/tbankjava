@@ -1,4 +1,9 @@
 package tb.wca.dto;
 
-public record WeatherResponseDTO() {
-}
+import tb.wca.model.WeatherModel;
+
+import java.util.List;
+
+public record WeatherResponseDTO(
+        List<WeatherModel> forecasts
+) { }

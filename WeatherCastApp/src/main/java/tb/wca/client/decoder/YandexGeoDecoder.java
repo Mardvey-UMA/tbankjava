@@ -19,7 +19,8 @@ public class YandexGeoDecoder implements Decoder {
 
     @Override
     public Object decode(Response response, Type type) throws IOException {
-        Object decoded = jacksonDecoder.decode(response, type);
+        Object decoded = jacksonDecoder.decode(response, YandexGeoResponse.class);
+
         if (decoded instanceof YandexGeoResponse yandexGeoResponse) {
             String found = yandexGeoResponse.response()
                     .geoObjectCollection()

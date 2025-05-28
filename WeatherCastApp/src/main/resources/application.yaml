@@ -11,7 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate.format_sql: true
 api-keys:
@@ -29,3 +29,6 @@ feign:
     config:
       default:
         loggerLevel: FULL
+logging:
+  level:
+    feign: DEBUG

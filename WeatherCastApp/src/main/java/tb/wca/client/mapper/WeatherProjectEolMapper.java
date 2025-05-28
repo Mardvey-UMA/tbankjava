@@ -12,9 +12,16 @@ import java.util.List;
 @Mapper(componentModel = "spring",
         imports = {LocalDateTime.class, DateTimeFormatter.class})
 public interface WeatherProjectEolMapper {
-    DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    @Mapping(target = "dateTime",
-            expression = "java(LocalDateTime.parse(raw.dtForecast(), ISO))") // ПАРСИТЬ ОТДЕЛЬНО ЧАС ОТДЕЛЬНО ДЕНЬ
-    WeatherModel toDto(WeatherProjectEolResponse response);
+    @Mapping(target = "date", expression = "java(LocalDateTime.parse(raw.dtForecast(), java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalDate())")
+    @Mapping(target = "time", expression = "java(LocalDateTime.parse(raw.dtForecast(), java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME).toLocalTime())")
+    @Mapping(source = "temp", target = "temp")
+    @Mapping(source = "feelsLike", target = "feelsLike")
+    @Mapping(source = "windSpeed", target = "windSpeed")
+    @Mapping(source = "windDir", target = "windDir")
+    @Mapping(source = "humidity", target = "humidity")
+    @Mapping(source = "pressure", target = "pressure")
+    @Mapping(source = "uvIndex", target = "uvIndex")
+    WeatherModel toDto(WeatherProjectEolResponse raw);
+
     List<WeatherModel> toDto(List<WeatherProjectEolResponse> response);
 }
