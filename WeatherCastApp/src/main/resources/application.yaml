@@ -14,3 +14,18 @@ spring:
     show-sql: true
     properties:
       hibernate.format_sql: true
+api-keys:
+  weather: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4MzMxOTYwLCJpYXQiOjE3NDgzMzE2NjAsImp0aSI6ImY3NWFiN2VlMzJiYTQxNDE5Y2Q4ZDYxYzA3MmU1NjFjIiwidXNlcl9pZCI6MTAxNX0.hBeqIZVrcpsqRiCZ-IuxIx_C6lQzatyaD6Y7je65bSc
+  city: 00c87056-218c-4064-9f7f-a5c3804b1087
+
+clients:
+  yandex-geocode:
+    url: https://geocode-maps.yandex.ru/v1
+  weather:
+    url: https://projecteol.ru/api/weather
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: FULL

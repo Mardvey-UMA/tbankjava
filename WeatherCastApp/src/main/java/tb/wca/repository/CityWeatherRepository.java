@@ -9,9 +9,12 @@ import tb.wca.entity.WeatherCastEntity;
 import tb.wca.exceptions.InvalidCityException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface CityWeatherRepository extends JpaRepository<CityWeatherEntity, Long> {
-
-    Optional<CityWeatherEntity> findByCity_NameAndDate(String city, LocalDate date);
+    List<CityWeatherEntity> findByCity_NameAndDate(String city, LocalDate date);
+    Optional<CityWeatherEntity> findByCity_NameAndDateAndTime(String cityName, LocalDate date, LocalTime time);
+    List<CityWeatherEntity> findByCity_NameAndDateBetween(String cityName, LocalDate startDate, LocalDate endDate);
 }
