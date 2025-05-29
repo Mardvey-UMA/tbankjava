@@ -3,13 +3,13 @@ package tb.wca.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tb.wca.client.WeatherApiClient;
+import tb.wca.dto.DateCoordsCityDTO;
 import tb.wca.entity.CityEntity;
 import tb.wca.entity.CityWeatherEntity;
 import tb.wca.entity.WeatherCastEntity;
 import tb.wca.exceptions.InvalidCityException;
 import tb.wca.exceptions.InvalidDateFormatException;
 import tb.wca.exceptions.InvalidHourFormatException;
-import tb.wca.exceptions.NotFoundDataException;
 import tb.wca.mapper.WeatherMapper;
 import tb.wca.model.CityGeoModel;
 import tb.wca.model.WeatherModel;
@@ -43,22 +43,31 @@ public class WeatherForecastServiceImpl implements WeatherForecastService {
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
+    private static final Integer HOURS_IN_DAY = 24;
+    private static final String MIDNIGHT = "00";
+    private static final String COMMA = ",";
+    private static final String CORRECT_HOUR_REGEX = "^(0[0-9]|1[0-9]|2[0-3])$";
+    private static final Set<String> MILLION_CITIES = Set.of(
+            "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Казань",
+            "Нижний Новгород", "Челябинск", "Самара", "Омск", "Ростов-на-Дону",
+            "Уфа", "Красноярск", "Воронеж", "Пермь", "Волгоград", "Саратов");
+
     @Override
     public List<WeatherModel> getWeatherForecastByDay(String cityName, String day) {
-        LocalDate requestDate = parseDateOrThrow(day);
-        CityGeoModel coordinates = coordinatesService.getCoordinatesByCityName(cityName);
-        CityEntity city = getCityOrThrow(cityName);
-        List<CityWeatherEntity> existingForecasts = cityWeatherRepository.findByCity_NameAndDate(cityName, requestDate);
 
-        if (existingForecasts.size() >= 24) {
-            return mapCityWeatherToModels(existingForecasts);
-        }
+        DateCoordsCityDTO weatherInfo = getRequestDateAndCityCoords(
+                cityName,
+                day);
 
-        List<WeatherModel> apiForecasts = weatherApiClient.getWeather(
-                coordinates.lat().doubleValue(),
-                coordinates.lon().doubleValue(),
-                requestDate.toString()
-        );
+        List<CityWeatherEntity> existingForecasts = cityWeatherRepository.findByCity_NameAndDate(
+                cityName,
+                weatherInfo.requestDate());
+
+        if (existingForecasts.size() >= HOURS_IN_DAY) return mapCityWeatherToModels(existingForecasts);
+
+        List<WeatherModel> apiForecasts = getWeather(
+                weatherInfo.coordinates(),
+                day);
 
         var existingHours = existingForecasts.stream()
                 .map(CityWeatherEntity::getTime)
@@ -68,81 +77,68 @@ public class WeatherForecastServiceImpl implements WeatherForecastService {
                 .filter(wm -> !existingHours.contains(wm.time()))
                 .toList();
 
-        if (!missingForecasts.isEmpty()) {
-            saveWeatherModelsForCityAndDate(missingForecasts, city, requestDate);
-        }
+        if (!missingForecasts.isEmpty()) saveWeatherModelsForCityAndDate(
+                missingForecasts,
+                weatherInfo.cityEntity(),
+                weatherInfo.requestDate());
 
-        List<CityWeatherEntity> totalForecasts = cityWeatherRepository.findByCity_NameAndDate(cityName, requestDate);
-
-        return mapCityWeatherToModels(totalForecasts);
+        return mapCityWeatherToModels(cityWeatherRepository.findByCity_NameAndDate(
+                cityName,
+                weatherInfo.requestDate()));
     }
 
     @Override
     public List<WeatherModel> getWeatherForecastByDayAndHour(String cityName, String day, String hour) {
-        LocalDate requestDate = parseDateOrThrow(day);
-        CityGeoModel coordinates = coordinatesService.getCoordinatesByCityName(cityName);
-        if ("24".equals(hour)) {
-            hour = "00";
-        }
-        if (!hour.matches("^(0[0-9]|1[0-9]|2[0-3])$")) {
-            throw new InvalidHourFormatException();
-        }
 
-        LocalTime requestTime = LocalTime.of(Integer.parseInt(hour), 0);
-        CityEntity city = getCityOrThrow(cityName);
+        DateCoordsCityDTO weatherInfo = getRequestDateAndCityCoords(cityName, day, hour);
 
-        Optional<CityWeatherEntity> existingForecastOpt =
-                cityWeatherRepository.findByCity_NameAndDateAndTime(cityName, requestDate, requestTime);
+        if (MILLION_CITIES.contains(weatherInfo.cityEntity().getName())){
+            List<WeatherModel> apiForecasts = getWeather(
+                    weatherInfo.coordinates(),
+                    day);
 
-        if (existingForecastOpt.isPresent()) {
-            return List.of(weatherMapper.cityWeatherEntityToWeatherModel(existingForecastOpt.get()));
+            saveWeatherModelsForCityAndDate(
+                    apiForecasts,
+                    weatherInfo.cityEntity(),
+                    weatherInfo.requestDate());
         }
 
-        LocalDateTime dateTime = LocalDateTime.of(requestDate, requestTime);
-        List<WeatherModel> apiForecast = weatherApiClient.getWeather(
-                coordinates.lat().doubleValue(),
-                coordinates.lon().doubleValue(),
-                dateTime.format(dateTimeFormatter)
-        );
+        Optional<CityWeatherEntity> existingForecastOpt = cityWeatherRepository.
+                findByCity_NameAndDateAndTime(
+                        cityName, weatherInfo.requestDate(),
+                        weatherInfo.requestTime());
 
-        if (apiForecast.isEmpty()) {
-            throw new NotFoundDataException();
-        }
+        if (existingForecastOpt.isPresent()) return List.of(
+                weatherMapper.cityWeatherEntityToWeatherModel(
+                        existingForecastOpt.get()));
 
-        saveWeatherModelsForCityAndDate(apiForecast, city, requestDate);
+        String requestDateTime = LocalDateTime.of(weatherInfo.requestDate(),
+                weatherInfo.requestTime()).format(dateTimeFormatter);
+
+        List<WeatherModel> apiForecast = getWeather(
+                weatherInfo.coordinates(),
+                requestDateTime);
+
+        saveWeatherModelsForCityAndDate(apiForecast, weatherInfo.cityEntity(), weatherInfo.requestDate());
 
         return apiForecast;
     }
 
     @Override
     public List<WeatherModel> getWeatherForecastByRange(String cityName, String startDate, String endDate) {
-        LocalDate localStartDate = parseDateOrThrow(startDate);
-        LocalDate localEndDate = parseDateOrThrow(endDate);
-        CityGeoModel coordinates = coordinatesService.getCoordinatesByCityName(cityName);
 
-        if (localEndDate.isBefore(localStartDate)) {
-            throw new InvalidDateFormatException();
-        }
+        DateCoordsCityDTO weatherInfo = getDateCityCoordsByRange(cityName, startDate, endDate);
 
-        CityEntity city = getCityOrThrow(cityName);
+        List<CityWeatherEntity> existingForecasts = cityWeatherRepository.findByCity_NameAndDateBetween(cityName, weatherInfo.startDate(), weatherInfo.endDate());
+        long totalExpectedHours = (weatherInfo.endDate().toEpochDay() - weatherInfo.startDate().toEpochDay() + 1) * HOURS_IN_DAY;
 
-        List<CityWeatherEntity> existingForecasts = cityWeatherRepository.findByCity_NameAndDateBetween(cityName, localStartDate, localEndDate);
+        if (existingForecasts.size() >= totalExpectedHours) return mapCityWeatherToModels(existingForecasts);
 
-        long totalExpectedHours = (localEndDate.toEpochDay() - localStartDate.toEpochDay() + 1) * 24;
+        String requestRange = weatherInfo.startDate() + COMMA + weatherInfo.endDate();
 
-        if (existingForecasts.size() >= totalExpectedHours) {
-            return mapCityWeatherToModels(existingForecasts);
-        }
+        List<WeatherModel> apiForecasts = getWeather(weatherInfo.coordinates(), requestRange);
 
-        String requestRange = localStartDate + "," + localEndDate;
-
-        List<WeatherModel> apiForecasts = weatherApiClient.getWeather(
-                coordinates.lat().doubleValue(),
-                coordinates.lon().doubleValue(),
-                requestRange
-        );
-
-        var existingDateTimeSet = existingForecasts.stream()
+        Set<LocalDateTime> existingDateTimeSet = existingForecasts.stream()
                 .map(cw -> cw.getDate().atTime(cw.getTime()))
                 .collect(Collectors.toSet());
 
@@ -155,15 +151,66 @@ public class WeatherForecastServiceImpl implements WeatherForecastService {
                     .collect(Collectors.groupingBy(WeatherModel::date));
 
             for (var entry : groupedByDate.entrySet()) {
-                saveWeatherModelsForCityAndDate(entry.getValue(), city, entry.getKey());
+                saveWeatherModelsForCityAndDate(entry.getValue(), weatherInfo.cityEntity(), entry.getKey());
             }
         }
 
-        List<CityWeatherEntity> updatedForecasts = cityWeatherRepository.findByCity_NameAndDateBetween(cityName, localStartDate, localEndDate);
+        List<CityWeatherEntity> updatedForecasts = cityWeatherRepository.findByCity_NameAndDateBetween(cityName, weatherInfo.startDate(), weatherInfo.endDate());
 
         return mapCityWeatherToModels(updatedForecasts);
     }
 
+    private DateCoordsCityDTO getRequestDateAndCityCoords(String cityName, String date) {
+        LocalDate requestDate = parseDateOrThrow(date);
+        CityGeoModel coordinates = coordinatesService.getCoordinatesByCityName(cityName);
+        CityEntity city = getCityOrThrow(cityName);
+        return DateCoordsCityDTO.builder()
+                .coordinates(coordinates)
+                .cityEntity(city)
+                .requestDate(requestDate)
+                .build();
+    }
+
+    private DateCoordsCityDTO getRequestDateAndCityCoords(String cityName, String date, String hour) {
+        DateCoordsCityDTO correctDateAndCoordinates = getRequestDateAndCityCoords(cityName, date);
+        LocalTime requestTime =  checkHourFormat(hour);
+        return DateCoordsCityDTO.builder()
+                .coordinates(correctDateAndCoordinates.coordinates())
+                .cityEntity(correctDateAndCoordinates.cityEntity())
+                .requestDate(correctDateAndCoordinates.requestDate())
+                .requestTime(requestTime)
+                .build();
+    }
+
+    private DateCoordsCityDTO getDateCityCoordsByRange(String cityName, String startDate, String endDate) {
+        LocalDate requestEndDate = parseDateOrThrow(endDate);
+        DateCoordsCityDTO correctDateAndCoordinates = getRequestDateAndCityCoords(cityName, startDate);
+        if (correctDateAndCoordinates.startDate().isBefore(requestEndDate)) throw new InvalidDateFormatException();
+        return DateCoordsCityDTO.builder()
+                .coordinates(correctDateAndCoordinates.coordinates())
+                .cityEntity(correctDateAndCoordinates.cityEntity())
+                .startDate(correctDateAndCoordinates.requestDate())
+                .endDate(requestEndDate)
+                .build();
+    }
+
+    private List<WeatherModel> getWeather(CityGeoModel coordinates, String requestParam) {
+        return weatherApiClient.getWeather(
+                coordinates.lat().doubleValue(),
+                coordinates.lon().doubleValue(),
+                requestParam
+        );
+    }
+
+    private LocalTime checkHourFormat(String hour) {
+        if (HOURS_IN_DAY.toString().equals(hour)) {
+            hour = MIDNIGHT;
+        }
+        if (!hour.matches(CORRECT_HOUR_REGEX)) {
+            throw new InvalidHourFormatException();
+        }
+        return LocalTime.of(Integer.parseInt(hour), 0);
+    }
 
     private LocalDate parseDateOrThrow(String dateStr) {
         try {
@@ -188,7 +235,6 @@ public class WeatherForecastServiceImpl implements WeatherForecastService {
         List<WeatherCastEntity> savedEntities = weatherCastRepository.saveAll(entities);
 
         AtomicInteger index = new AtomicInteger();
-
         List<CityWeatherEntity> cityWeatherEntities = weatherModels.stream()
                 .map(wm -> {
                     WeatherCastEntity weatherEntity = savedEntities.get(index.getAndIncrement());
