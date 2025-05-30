@@ -1,7 +1,7 @@
 package tb.wca.service.interfaces;
-import java.math.BigDecimal;
-import java.util.List;
+import tb.wca.model.CityGeoModel;
+import tb.wca.exceptions.CityNotFoundException;
 
 public interface CoordinatesService {
-    List<BigDecimal> getCoordinatesByCityName(String cityName);
+    CityGeoModel getCoordinatesByCityName(String cityName) throws CityNotFoundException;
 }

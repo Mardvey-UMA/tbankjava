@@ -1,5 +1,5 @@
 services:
-  local-storage:
+  weather-db:
     image: postgres:16.0
     restart: always
     environment:
@@ -8,3 +8,19 @@ services:
       POSTGRES_DB: 'weather_service_db'
     ports:
       - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  weather-service:
+    build:
+      context: .
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://weather-db:5432/weather_service_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+volumes:
+  postgres-data:
+
