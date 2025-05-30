@@ -27,21 +27,22 @@ public class WeatherDataServiceImpl implements WeatherDataService {
 
     @Override
     public List<WeatherModel> findByCityAndDate(String city, LocalDate date) {
-        return cityWeatherRepository.findByCity_NameAndDate(city, date).stream()
+        return cityWeatherRepository.findByCity_NameAndDate(city, date)
+                .stream()
                 .map(weatherMapper::cityWeatherEntityToWeatherModel)
                 .toList();
     }
 
     @Override
     public Optional<WeatherModel> findByCityDateTime(String city, LocalDate date, LocalTime time) {
-        return cityWeatherRepository
-                .findByCity_NameAndDateAndTime(city, date, time)
+        return cityWeatherRepository.findByCity_NameAndDateAndTime(city, date, time)
                 .map(weatherMapper::cityWeatherEntityToWeatherModel);
     }
 
     @Override
     public List<WeatherModel> findByCityAndRange(String city, LocalDate start, LocalDate end) {
-        return cityWeatherRepository.findByCity_NameAndDateBetween(city, start, end).stream()
+        return cityWeatherRepository.findByCity_NameAndDateBetween(city, start, end)
+                .stream()
                 .map(weatherMapper::cityWeatherEntityToWeatherModel)
                 .toList();
     }

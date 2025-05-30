@@ -19,7 +19,7 @@ public class WeatherCastController {
     private final CityWeatherService cityWeatherService;
 
     @GetMapping()
-    public WeatherResponseDTO weatherCast(@RequestBody WeatherRequestDTO request) throws EmptyCityException, InvalidCityException {
+    public WeatherResponseDTO weatherCast(@RequestBody WeatherRequestDTO request){
         return cityWeatherService.getWeather(request);
     }
 }

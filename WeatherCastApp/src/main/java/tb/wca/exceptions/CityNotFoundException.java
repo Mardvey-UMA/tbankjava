@@ -1,7 +1,15 @@
 package tb.wca.exceptions;
 
-public class CityNotFoundException extends RuntimeException{
+import lombok.Getter;
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+@Getter
+public class CityNotFoundException extends BusinessException{
+
     public CityNotFoundException() {
-        super("Город не найден");
+        super(BusinessErrorCodes.CITY_NOT_FOUND);
+    }
+
+    public CityNotFoundException(String additionalMessage) {
+        super(BusinessErrorCodes.CITY_NOT_FOUND, additionalMessage);
     }
 }

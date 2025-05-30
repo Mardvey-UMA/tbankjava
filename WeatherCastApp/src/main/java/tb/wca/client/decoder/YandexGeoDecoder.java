@@ -16,6 +16,7 @@ public class YandexGeoDecoder implements Decoder {
 
     private final JacksonDecoder jacksonDecoder = new JacksonDecoder();
     private final YandexGeoMapper yandexGeoMapper;
+    private static final String ZERO = "0";
 
     @Override
     public Object decode(Response response, Type type) throws IOException {
@@ -27,7 +28,7 @@ public class YandexGeoDecoder implements Decoder {
                     .metaDataProperty()
                     .geocoderResponseMetaData()
                     .found();
-            if ("0".equals(found)) {
+            if (ZERO.equals(found)) {
                 throw new CityNotFoundException();
             }
             return yandexGeoMapper.toDto(yandexGeoResponse);

@@ -22,13 +22,12 @@ public class CoordinatesServiceImpl implements CoordinatesService {
 
     @Override
     public CityGeoModel getCoordinatesByCityName(String cityName) throws CityNotFoundException {
-        Optional<CityEntity> currentCity = cityRepository.findByName(cityName);
-        if (currentCity.isPresent()){
-            return cityGeoMapper.entityToModel(currentCity.get());
-        }else{
-            CityGeoModel cityGeoModel = yandexGeocodeClient.geocode(cityName, "json");
-            CityEntity newCity = cityGeoMapper.modelToEntity(cityGeoModel);
-            return cityGeoMapper.entityToModel(cityRepository.save(newCity));
-        }
+          return cityRepository.findByName(cityName)
+                  .map(cityGeoMapper::entityToModel)
+                  .orElseGet(() ->{
+                      CityGeoModel cityGeoModel = yandexGeocodeClient.geocode(cityName, "json");
+                      CityEntity newCity = cityGeoMapper.modelToEntity(cityGeoModel);
+                      return cityGeoMapper.entityToModel(cityRepository.save(newCity));
+                  });
     }
 }

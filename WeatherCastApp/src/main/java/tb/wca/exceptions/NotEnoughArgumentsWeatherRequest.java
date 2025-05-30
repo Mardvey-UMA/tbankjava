@@ -1,7 +1,15 @@
 package tb.wca.exceptions;
 
-public class NotEnoughArgumentsWeatherRequest extends RuntimeException {
+import lombok.Getter;
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+@Getter
+public class NotEnoughArgumentsWeatherRequest extends BusinessException {
+
     public NotEnoughArgumentsWeatherRequest() {
-        super("Недостаточно аргументов для получения прогноза погоды");
+        super(BusinessErrorCodes.NOT_ENOUGH_ARGUMENTS);
+    }
+
+    public NotEnoughArgumentsWeatherRequest(String additionalMessage) {
+        super(BusinessErrorCodes.NOT_ENOUGH_ARGUMENTS, additionalMessage);
     }
 }

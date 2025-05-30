@@ -27,19 +27,19 @@ public interface YandexGeoMapper {
 
     default BigDecimal[] parseLowerCorner(YandexGeoResponse src) {
         if (src == null || src.response() == null || src.response().geoObjectCollection() == null) {
-            throw new InvalidApiResponse("YandexGeoAPI пустой ответ");
+            throw new InvalidApiResponse("YandexGeoAPI empty answer");
         }
         var featureMembers = src.response().geoObjectCollection().featureMember();
         if (featureMembers == null || featureMembers.isEmpty()) {
-            throw new InvalidApiResponse("YandexGeoAPI пустой ответ");
+            throw new InvalidApiResponse("YandexGeoAPI empty answer");
         }
         var lowerCorner = featureMembers.get(0).geoObject().boundedBy().Envelope().lowerCorner();
         if (lowerCorner == null || lowerCorner.isBlank()) {
-            throw new InvalidApiResponse("YandexGeoAPI пустые координаты");
+            throw new InvalidApiResponse("YandexGeoAPI empty coordinates");
         }
         String[] parts = lowerCorner.trim().split("\\s+");
         if (parts.length != 2) {
-            throw new InvalidApiResponse("YandexGeoAPI некорретный формат координат");
+            throw new InvalidApiResponse("YandexGeoAPI invalid coordinate format");
         }
         return new BigDecimal[] { new BigDecimal(parts[0]), new BigDecimal(parts[1]) };
     }

@@ -26,18 +26,19 @@ public class WeatherProjectEolDecoder implements Decoder {
         List<?> responseList = (List<?>) decoded;
 
         if (responseList.size() == 1 && responseList.get(0) instanceof String) {
-            throw new NotFoundDataException();
+            throw new NotFoundDataException("no weather forecast found for the specified date");
         }
 
         ObjectMapper mapper = new ObjectMapper();
 
         return responseList.stream()
                 .map(item -> {
-                        return weatherProjectEolMapper.toDto(
-                                mapper.convertValue(
-                                        item,
-                                        WeatherProjectEolResponse.class)
-                        );
+                    return weatherProjectEolMapper.toDto(
+                            mapper.convertValue(
+                                    item,
+                                    WeatherProjectEolResponse.class
+                            )
+                    );
                 })
                 .toList();
     }

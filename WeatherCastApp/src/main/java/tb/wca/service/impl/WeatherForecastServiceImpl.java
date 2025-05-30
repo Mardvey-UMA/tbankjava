@@ -110,7 +110,7 @@ public class WeatherForecastServiceImpl implements WeatherForecastService {
                                 !hoursSet.contains(m.time()))
                         .toList();
 
-                if (!newForecast.isEmpty()) weatherDataService.saveForCityAndDate(params.city(), params.startDate(), newForecast);
+                if (!newForecast.isEmpty()) weatherDataService.saveForCityAndDate(params.city(), date, newForecast);
             }
 
         });

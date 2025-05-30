@@ -1,5 +1,15 @@
 package tb.wca.exceptions;
 
-public class InvalidDateFormatException extends RuntimeException {
-    public InvalidDateFormatException() {super("Дата должна быть в формате yyyy-MM-dd, например 2025-12-31");}
+import lombok.Getter;
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+@Getter
+public class InvalidDateFormatException extends BusinessException {
+
+    public InvalidDateFormatException() {
+        super(BusinessErrorCodes.INVALID_DATE_FORMAT);
+    }
+
+    public InvalidDateFormatException( String additionalMessage) {
+        super(BusinessErrorCodes.INVALID_DATE_FORMAT, additionalMessage);
+    }
 }
