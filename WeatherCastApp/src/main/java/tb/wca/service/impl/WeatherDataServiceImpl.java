@@ -1,5 +1,6 @@
 package tb.wca.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tb.wca.entity.CityEntity;
@@ -48,6 +49,7 @@ public class WeatherDataServiceImpl implements WeatherDataService {
     }
 
     @Override
+    @Transactional
     public void saveForCityAndDate(CityEntity city, LocalDate date, List<WeatherModel> models) {
         List<WeatherCastEntity> weatherEntities = weatherMapper.modelToEntity(models);
         weatherCastRepository.saveAll(weatherEntities);
@@ -61,7 +63,25 @@ public class WeatherDataServiceImpl implements WeatherDataService {
                         .time(models.get(i).time())
                         .build())
                 .toList();
+        // TODO Обработать ошибку при сохранении
+        cityWeatherRepository.saveAll(cityWeatherEntities);
+    }
+    @Override
+    @Transactional
+    public void saveForCityAndWeatherList(CityEntity city, List<WeatherModel> models) {
+        List<WeatherCastEntity> weatherEntities = weatherMapper.modelToEntity(models);
+        weatherCastRepository.saveAll(weatherEntities);
 
+        List<CityWeatherEntity> cityWeatherEntities = IntStream
+                .range(0, models.size())
+                .mapToObj(i -> CityWeatherEntity.builder()
+                        .city(city)
+                        .weather(weatherEntities.get(i))
+                        .date(models.get(i).date())
+                        .time(models.get(i).time())
+                        .build())
+                .toList();
+        // TODO Обработать ошибку при сохранении
         cityWeatherRepository.saveAll(cityWeatherEntities);
     }
 }

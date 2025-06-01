@@ -1,7 +1,6 @@
 package tb.wca.exceptions;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -46,8 +45,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getErrorCode(), ex.getMessage());
     }
 
-    @ExceptionHandler(NotEnoughArgumentsWeatherRequest.class)
-    public ResponseEntity<ExceptionResponse> handleNotEnoughArgumentsWeatherRequest(NotEnoughArgumentsWeatherRequest ex) {
+    @ExceptionHandler(NotEnoughArgumentsWeatherRequestException.class)
+    public ResponseEntity<ExceptionResponse> handleNotEnoughArgumentsWeatherRequest(NotEnoughArgumentsWeatherRequestException ex) {
         return buildErrorResponse(ex.getErrorCode(), ex.getMessage());
     }
 

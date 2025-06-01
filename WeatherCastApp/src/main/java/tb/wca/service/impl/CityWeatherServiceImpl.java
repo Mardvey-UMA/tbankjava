@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tb.wca.dto.WeatherRequestDTO;
 import tb.wca.dto.WeatherResponseDTO;
-import tb.wca.exceptions.NotEnoughArgumentsWeatherRequest;
+import tb.wca.exceptions.NotEnoughArgumentsWeatherRequestException;
 import tb.wca.model.WeatherModel;
 import tb.wca.service.interfaces.CityWeatherService;
 import tb.wca.service.interfaces.WeatherForecastService;
@@ -42,7 +42,7 @@ public class CityWeatherServiceImpl implements CityWeatherService {
             return new WeatherResponseDTO(weatherModels);
 
         } else {
-            throw new NotEnoughArgumentsWeatherRequest();
+            throw new NotEnoughArgumentsWeatherRequestException();
         }
     }
 }

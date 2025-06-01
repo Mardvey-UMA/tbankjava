@@ -13,4 +13,5 @@ public interface WeatherDataService {
     Optional<WeatherModel> findByCityDateTime(String city, LocalDate date, LocalTime time);
     List<WeatherModel> findByCityAndRange(String city, LocalDate start, LocalDate end);
     void saveForCityAndDate(CityEntity city, LocalDate date, List<WeatherModel> models);
+    void saveForCityAndWeatherList(CityEntity city, List<WeatherModel> models);
 }

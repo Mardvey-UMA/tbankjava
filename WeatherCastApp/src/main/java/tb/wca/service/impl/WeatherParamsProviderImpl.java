@@ -9,7 +9,7 @@ import tb.wca.model.CityGeoModel;
 import tb.wca.model.RequestParams;
 import tb.wca.repository.CityRepository;
 import tb.wca.service.interfaces.CoordinatesService;
-import tb.wca.service.interfaces.WeatherRequestBuilderService;
+import tb.wca.service.interfaces.WeatherParamsProvider;
 import tb.wca.util.DateTimeValidator;
 
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
-public class WeatherRequestBuilderServiceImpl implements WeatherRequestBuilderService {
+public class WeatherParamsProviderImpl implements WeatherParamsProvider {
 
     private final CoordinatesService coordinatesService;
     private final CityRepository cityRepository;

@@ -3,13 +3,14 @@ package tb.wca.exceptions;
 import lombok.Getter;
 import tb.wca.exceptions.enums.BusinessErrorCodes;
 @Getter
-public class NotEnoughArgumentsWeatherRequest extends BusinessException {
+public class NotEnoughArgumentsWeatherRequestException extends BusinessException {
 
-    public NotEnoughArgumentsWeatherRequest() {
+    public NotEnoughArgumentsWeatherRequestException() {
         super(BusinessErrorCodes.NOT_ENOUGH_ARGUMENTS);
     }
 
-    public NotEnoughArgumentsWeatherRequest(String additionalMessage) {
+    public NotEnoughArgumentsWeatherRequestException(String additionalMessage) {
         super(BusinessErrorCodes.NOT_ENOUGH_ARGUMENTS, additionalMessage);
     }
 }
+
