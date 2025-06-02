@@ -1,5 +1,6 @@
 package tb.wca.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,7 @@ public class WeatherCastController {
     private final CityWeatherService cityWeatherService;
 
     @GetMapping()
-    public WeatherResponseDTO weatherCast(@RequestBody WeatherRequestDTO request){
+    public WeatherResponseDTO weatherCast(@RequestBody @Valid WeatherRequestDTO request){
         return cityWeatherService.getWeather(request);
     }
 }

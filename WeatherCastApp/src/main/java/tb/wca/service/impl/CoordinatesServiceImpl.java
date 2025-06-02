@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tb.wca.client.YandexGeocodeClient;
 import tb.wca.entity.CityEntity;
+import tb.wca.exceptions.CityNotFoundException;
 import tb.wca.mapper.CityGeoMapper;
 import tb.wca.model.CityGeoModel;
-import tb.wca.exceptions.CityNotFoundException;
 import tb.wca.repository.CityRepository;
 import tb.wca.service.interfaces.CoordinatesService;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

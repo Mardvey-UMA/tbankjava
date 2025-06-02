@@ -19,30 +19,30 @@ public class CityWeatherServiceImpl implements CityWeatherService {
 
     @Override
     public WeatherResponseDTO getWeather(WeatherRequestDTO request) {
-        String city = request.cityName();
+        List<WeatherModel> weatherModels;
 
         if (request.date() != null && request.hour() != null) {
-            List<WeatherModel> weatherModels = weatherForecastService.getWeatherForecastByDayAndHour(
-                    city,
+
+            weatherModels = weatherForecastService.getWeatherForecastByDayAndHour(
+                    request.cityName(),
                     request.date(),
                     request.hour());
-            return new WeatherResponseDTO(weatherModels);
 
         } else if (request.date() != null) {
-            List<WeatherModel> weatherModels = weatherForecastService.getWeatherForecastByDay(
-                    city,
+
+            weatherModels = weatherForecastService.getWeatherForecastByDay(
+                    request.cityName(),
                     request.date());
-            return new WeatherResponseDTO(weatherModels);
 
         } else if (request.startDate() != null && request.endDate() != null) {
-            List<WeatherModel> weatherModels = weatherForecastService.getWeatherForecastByRange(
-                    city,
+
+            weatherModels = weatherForecastService.getWeatherForecastByRange(
+                    request.cityName(),
                     request.startDate(),
                     request.endDate());
-            return new WeatherResponseDTO(weatherModels);
-
         } else {
             throw new NotEnoughArgumentsWeatherRequestException();
         }
+        return new WeatherResponseDTO(weatherModels);
     }
 }

@@ -55,5 +55,20 @@ public interface WeatherMapper {
         );
     }
 
+    default CityWeatherEntity weatherModelToCityWeatherEntity(WeatherModel model) {
+        if (model == null) {
+            return null;
+        }
+
+        CityWeatherEntity cityWeather = new CityWeatherEntity();
+        cityWeather.setDate(model.date());
+        cityWeather.setTime(model.time());
+
+        cityWeather.setWeather(modelToEntity(model));
+
+        return cityWeather;
+    }
+
+
 }
 

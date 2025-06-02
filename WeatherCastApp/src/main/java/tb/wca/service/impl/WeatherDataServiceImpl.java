@@ -47,7 +47,7 @@ public class WeatherDataServiceImpl implements WeatherDataService {
                 .map(weatherMapper::cityWeatherEntityToWeatherModel)
                 .toList();
     }
-
+    // TODO Обработать ошибку при сохранении
     @Override
     @Transactional
     public void saveForCityAndDate(CityEntity city, LocalDate date, List<WeatherModel> models) {
@@ -63,9 +63,10 @@ public class WeatherDataServiceImpl implements WeatherDataService {
                         .time(models.get(i).time())
                         .build())
                 .toList();
-        // TODO Обработать ошибку при сохранении
+
         cityWeatherRepository.saveAll(cityWeatherEntities);
     }
+    // TODO Обработать ошибку при сохранении
     @Override
     @Transactional
     public void saveForCityAndWeatherList(CityEntity city, List<WeatherModel> models) {
@@ -81,7 +82,7 @@ public class WeatherDataServiceImpl implements WeatherDataService {
                         .time(models.get(i).time())
                         .build())
                 .toList();
-        // TODO Обработать ошибку при сохранении
+
         cityWeatherRepository.saveAll(cityWeatherEntities);
     }
 }
