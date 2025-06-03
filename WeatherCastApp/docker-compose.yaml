@@ -75,6 +75,8 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 'kafka:9092'
+    depends_on:
+      - kafka
     networks:
       - app-network
 

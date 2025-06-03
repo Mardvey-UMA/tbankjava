@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS public.weather (
     id BIGSERIAL PRIMARY KEY,
     temperature DECIMAL,
@@ -28,5 +27,5 @@ CREATE TABLE IF NOT EXISTS public.city_weather (
     CONSTRAINT fk_weather FOREIGN KEY (weather_id) REFERENCES public.weather(id),
     CONSTRAINT fk_city FOREIGN KEY (city_id) REFERENCES public.city(id),
     CONSTRAINT unique_city_date_time UNIQUE (city_id, date, time)
-    );
+);
 

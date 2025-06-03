@@ -1,4 +1,17 @@
 spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    properties:
+      spring.json.trusted.packages: "tb.wca.*"
+    consumer:
+      group-id: weather-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
   flyway:
     baseline-on-migrate: true
     baseline-version: 1
