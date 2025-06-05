@@ -4,25 +4,20 @@ set -euo pipefail
 SR_URL="${SCHEMA_REGISTRY_URL:-http://schema-registry:8081}"
 SCHEMA_DIR="${SCHEMA_DIR:-/schemas}"
 
-echo "---> Waiting until Schema Registry ($SR_URL) is up..."
 until curl -fsS "$SR_URL/subjects" >/dev/null 2>&1; do
   sleep 1
 done
-echo "---> Schema Registry reachable at $SR_URL"
-echo
 
 declare -A MAPPING=(
   ["WeatherResponseKafkaDTO"]="weather-subscribers"
 )
 
-echo "---> Registering local *.avsc → subject according to topic mapping"
 for file in "$SCHEMA_DIR"/*.avsc; do
   [ -e "$file" ] || { echo "No .avsc found in $SCHEMA_DIR"; exit 0; }
 
   base="$(basename "$file" .avsc)"
 
   if [[ -z "${MAPPING[$base]:-}" ]]; then
-    echo "  [WARN] No topic mapping for '$base' → skipping"
     continue
   fi
 
@@ -31,7 +26,6 @@ for file in "$SCHEMA_DIR"/*.avsc; do
 
   schema_str=$(jq -Rs . <"$file")
 
-  echo "  → Registering $file as subject '$subj'..."
   curl -sS -X POST \
        -H "Content-Type: application/vnd.schemaregistry.v1+json" \
        --data "{\"schema\":${schema_str}}" \
@@ -39,5 +33,3 @@ for file in "$SCHEMA_DIR"/*.avsc; do
     && echo "    [ok] $subj registered" \
     || echo "    [error] failed to register $subj"
 done
-
-echo "All done."

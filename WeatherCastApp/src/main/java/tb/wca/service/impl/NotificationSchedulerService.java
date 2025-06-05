@@ -1,7 +1,6 @@
 package tb.wca.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tb.wca.avro.WeatherResponseKafkaDTO;
@@ -24,7 +23,7 @@ public class NotificationSchedulerService {
     private final SubscriberSendService subscriberSendService;
     private final WeatherResponseMapper weatherResponseMapper;
 
-    @Scheduled(cron = "0 /10 * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void sendScheduledNotifications() {
         ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
         List<SubscriptionEntity> activeSubscriptions = subscriptionRepository.findByIsActive(true);

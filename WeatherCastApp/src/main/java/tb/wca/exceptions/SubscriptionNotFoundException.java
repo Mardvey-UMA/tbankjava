@@ -1,7 +1,13 @@
 package tb.wca.exceptions;
 
-public class SubscriptionNotFoundException extends RuntimeException {
-    public SubscriptionNotFoundException(Long teleramId) {
-        super("Subscription for user with teleramId = " + telegramId + " not found");
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+
+public class SubscriptionNotFoundException extends BusinessException {
+    public SubscriptionNotFoundException(Long telegramId)
+        {
+            super(BusinessErrorCodes.SUBSCRIPTION_NOT_FOUND);
+        }
+    public SubscriptionNotFoundException(String additionalMessage) {
+        super(BusinessErrorCodes.SUBSCRIPTION_NOT_FOUND, additionalMessage);
     }
 }

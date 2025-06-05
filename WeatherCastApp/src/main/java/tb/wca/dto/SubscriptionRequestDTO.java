@@ -14,11 +14,17 @@ public record SubscriptionRequestDTO(
         @NotBlank(message = "City name must not be blank")
         String cityName,
 
-        @NotNull(message = "Notification time must not be null")
         LocalTime notificationTime,
 
         String timeZone
 ) {
+        @AssertTrue(message = "notificationTime must be in HH:mm format")
+        private boolean isNotificationTimeValid() {
+                if (notificationTime == null) return false;
+                return notificationTime.getSecond() == 0
+                        && notificationTime.getNano()   == 0;
+        }
+
         @AssertTrue(message = "timeZone must be provided and must be a valid ZoneId")
         private boolean isTimeZoneValid() {
                 if (timeZone == null || timeZone.isBlank()) {

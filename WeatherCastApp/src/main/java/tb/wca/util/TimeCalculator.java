@@ -6,6 +6,7 @@ import tb.wca.entity.SubscriptionEntity;
 import tb.wca.entity.UserEntity;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -32,6 +33,11 @@ public final class TimeCalculator {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid time zone: " + timeZone);
         }
+    }
+
+    public static LocalDateTime instantToLocalDateTime(Instant instant, String timeZone) {
+        return instant == null ? null
+                : LocalDateTime.ofInstant(instant, ZoneId.of(timeZone));
     }
 
     public static SubscriptionEntity buildNewSubscription(

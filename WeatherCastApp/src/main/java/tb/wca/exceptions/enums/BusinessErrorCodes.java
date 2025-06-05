@@ -19,7 +19,9 @@ public enum BusinessErrorCodes {
     INVALID_ARGUMENTS(400, HttpStatus.BAD_REQUEST, "Invalid arguments"),
     CONSTRAINT_VIOLATION(400, HttpStatus.BAD_REQUEST, "Constraint violation"),
     DATA_INTEGRITY_VIOLATION(400, HttpStatus.BAD_REQUEST, "Data integrity violation"),
-    INVALID_FORMAT(400, HttpStatus.BAD_REQUEST, "Invalid JSON format");
+    INVALID_FORMAT(400, HttpStatus.BAD_REQUEST, "Invalid JSON format"),
+    USER_NOT_FOUND(403, HttpStatus.NOT_FOUND, "User not found"),
+    SUBSCRIPTION_NOT_FOUND(403, HttpStatus.NOT_FOUND, "Subscription not found");
 
     private final int code;
     private final HttpStatus httpStatus;

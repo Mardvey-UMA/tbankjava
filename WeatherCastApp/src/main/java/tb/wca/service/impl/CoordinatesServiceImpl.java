@@ -24,8 +24,27 @@ public class CoordinatesServiceImpl implements CoordinatesService {
                   .map(cityGeoMapper::entityToModel)
                   .orElseGet(() ->{
                       CityGeoModel cityGeoModel = yandexGeocodeClient.geocode(cityName, "json");
-                      CityEntity newCity = cityGeoMapper.modelToEntity(cityGeoModel);
-                      return cityGeoMapper.entityToModel(cityRepository.save(newCity));
+                      return cityRepository.findByName(cityGeoModel.city())
+                              .map(cityGeoMapper::entityToModel)
+                              .orElseGet(
+                                      () ->{
+                                          CityEntity newCity = cityGeoMapper.modelToEntity(cityGeoModel);
+                                          return cityGeoMapper.entityToModel(cityRepository.save(newCity));
+                                      }
+                              );
                   });
+    }
+
+    @Override
+    public CityEntity getCoordinatesByCityNameReturnSavedEntity(String cityName) throws CityNotFoundException {
+        return cityRepository.findByName(cityName)
+                .orElseGet(() ->{
+                    CityGeoModel cityGeoModel = yandexGeocodeClient.geocode(cityName, "json");
+                    return cityRepository.findByName(cityGeoModel.city())
+                            .orElseGet(() -> {
+                                CityEntity newCity = cityGeoMapper.modelToEntity(cityGeoModel);
+                                return cityRepository.save(newCity);
+                            });
+                });
     }
 }

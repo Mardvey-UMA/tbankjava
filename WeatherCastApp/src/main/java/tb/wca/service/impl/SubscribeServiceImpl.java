@@ -9,7 +9,6 @@ import tb.wca.entity.SubscriptionEntity;
 import tb.wca.entity.UserEntity;
 import tb.wca.exceptions.SubscriptionNotFoundException;
 import tb.wca.exceptions.UserNotFoundException;
-import tb.wca.mapper.CityGeoMapper;
 import tb.wca.repository.SubscriptionRepository;
 import tb.wca.repository.UserRepository;
 import tb.wca.service.interfaces.CoordinatesService;
@@ -18,7 +17,6 @@ import tb.wca.service.interfaces.SubscribeService;
 import java.util.Optional;
 
 import static tb.wca.util.TimeCalculator.buildNewSubscription;
-import static tb.wca.util.TimeCalculator.calculateNextNotification;
 import static tb.wca.util.TimeCalculator.validateTimeZone;
 
 @Service
@@ -28,7 +26,6 @@ public class SubscribeServiceImpl implements SubscribeService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final CoordinatesService coordinatesService;
-    private final CityGeoMapper cityGeoMapper;
 
     @Override
     public SubscriptionResponseDTO createSubscribe(SubscriptionRequestDTO request, Long telegramId) {
@@ -45,7 +42,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         SubscriptionEntity newSubscription = buildNewSubscription(user, city, request);
         subscriptionRepository.save(newSubscription);
 
-        return new SubscriptionResponseDTO(calculateNextNotification(newSubscription));
+        return SubscriptionResponseDTO.of(newSubscription);
     }
 
     @Override
@@ -63,7 +60,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         subscription.setIsActive(true);
         subscriptionRepository.save(subscription);
 
-        return new SubscriptionResponseDTO(calculateNextNotification(subscription));
+        return SubscriptionResponseDTO.of(subscription);
     }
 
     @Override
@@ -74,7 +71,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         subscription.setIsActive(false);
         subscriptionRepository.save(subscription);
 
-        return new SubscriptionResponseDTO(null);
+        return SubscriptionResponseDTO.message("Deactivated");
     }
 
     @Override
@@ -83,7 +80,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         SubscriptionEntity subscription = getSubscriptionOrThrow(user);
 
         subscriptionRepository.delete(subscription);
-        return new SubscriptionResponseDTO(null);
+        return SubscriptionResponseDTO.message("Deleted subscription");
     }
 
     private SubscriptionResponseDTO updateSubscription(SubscriptionEntity subscription, SubscriptionRequestDTO request) {
@@ -102,7 +99,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         subscription.setIsActive(true);
         subscriptionRepository.save(subscription);
 
-        return new SubscriptionResponseDTO(calculateNextNotification(subscription));
+        return SubscriptionResponseDTO.of(subscription);
     }
 
     private UserEntity getUserOrThrow(Long telegramId) {
@@ -116,8 +113,6 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     private CityEntity getCityEntity(String cityName) {
-        return cityGeoMapper.modelToEntity(
-                coordinatesService.getCoordinatesByCityName(cityName)
-        );
+        return coordinatesService.getCoordinatesByCityNameReturnSavedEntity(cityName);
     }
 }

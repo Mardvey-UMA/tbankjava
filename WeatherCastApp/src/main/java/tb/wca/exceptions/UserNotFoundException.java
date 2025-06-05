@@ -1,8 +1,13 @@
 package tb.wca.exceptions;
 
-public class UserNotFoundException extends RuntimeException {
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+
+public class UserNotFoundException extends BusinessException {
     public UserNotFoundException(Long telegramId) {
-        super("User with telegramId=" + telegramId + " not found");
+        super(BusinessErrorCodes.USER_NOT_FOUND);
+    }
+    public UserNotFoundException(String additionalMessage) {
+        super(BusinessErrorCodes.NOT_FOUND_DATA, additionalMessage);
     }
 }
 

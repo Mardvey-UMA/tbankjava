@@ -55,6 +55,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getErrorCode(), ex.getMessage());
     }
 
+    @ExceptionHandler(SubscriptionNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleSubscriptionNotFoundException(SubscriptionNotFoundException ex) {
+        return buildErrorResponse(ex.getErrorCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        return buildErrorResponse(ex.getErrorCode(), ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         String details = ex.getBindingResult()
