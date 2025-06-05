@@ -37,6 +37,23 @@ services:
     networks:
       - app-network
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    container_name: schema-registry
+    depends_on:
+      - kafka
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_SCHEMA_DELETION_ENABLED: "true"
+      SCHEMA_REGISTRY_SCHEMA_VERSION_DELETION_ENABLED: "true"
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_COMPATIBILITY_LEVEL: FULL
+    ports:
+      - '8081:8081'
+    networks:
+      - app-network
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -45,8 +62,22 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: local-cluster
       KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_SCHEMA_REGISTRY: http://schema-registry:8081
     depends_on:
       - kafka
+      - schema-registry
+    networks:
+      - app-network
+
+  schema-loader:
+    build: ./schema-loader
+    depends_on:
+      - schema-registry
+    environment:
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      SCHEMA_DIR: /schemas
+    volumes:
+      - ./src/main/avro:/schemas:ro
     networks:
       - app-network
 
@@ -75,6 +106,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 'kafka:9092'
+      SPRING_KAFKA_PROPERTIES_SCHEMA_REGISTRY_URL: http://schema-registry:8081
     depends_on:
       - kafka
     networks:
@@ -85,5 +117,6 @@ networks:
     driver: bridge
 
 volumes:
+  schemas-dir: {}
   postgres-data:
 

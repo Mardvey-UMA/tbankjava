@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 );
 
 
-CREATE TABLE IF NOT EXISTS public.subscriptions (
+CREATE TABLE IF NOT EXISTS public.subscription (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     city_id BIGINT NOT NULL,
@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
 
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE,
     CONSTRAINT fk_city FOREIGN KEY (city_id) REFERENCES public.city(id) ON DELETE CASCADE,
-    CONSTRAINT unique_user_city UNIQUE (user_id, city_id)
+    CONSTRAINT unique_user_id UNIQUE (user_id)
 );
+
 

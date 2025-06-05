@@ -2,6 +2,7 @@ package tb.wca.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class WeatherCastController {
     private final CityWeatherService cityWeatherService;
 
     @GetMapping()
-    public WeatherResponseDTO weatherCast(@RequestBody @Valid WeatherRequestDTO request){
-        return cityWeatherService.getWeather(request);
+    public ResponseEntity<WeatherResponseDTO> weatherCast(@RequestBody @Valid WeatherRequestDTO request){
+        return ResponseEntity.ok(cityWeatherService.getWeather(request));
     }
 }

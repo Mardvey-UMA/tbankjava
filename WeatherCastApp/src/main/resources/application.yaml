@@ -1,16 +1,27 @@
 spring:
   kafka:
     bootstrap-servers: kafka:9092
+    topics:
+      subscription-request: subscription-requests
+      subscription-response: subscription-responses
+      weather-request: weather-requests
+      weather-response: weather-responses
+
     properties:
-      spring.json.trusted.packages: "tb.wca.*"
-    consumer:
-      group-id: weather-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      schema.registry.url: http://schema-registry:8081
+      specific.avro.reader: true
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      group-id: weather-app
+      auto-offset-reset: earliest
+
+
 
   flyway:
     baseline-on-migrate: true
