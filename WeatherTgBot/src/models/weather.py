@@ -60,6 +60,9 @@ class SubscriptionRequestDTO(BaseModel):
 
 class SubscriptionResponseDTO(BaseModel):
     """Модель ответа с информацией о подписке"""
+    city_name: Optional[str] = Field(None, alias="cityName")
+    notification_time: Optional[str] = Field(None, alias="notificationTime")
+    time_zone: Optional[str] = Field(None, alias="timeZone")
     expected_next_notification_date_time: Optional[datetime] = Field(None, alias="expectedNextNotificationDateTime")
     expected_next_notification_date_time_formatted: Optional[datetime] = Field(None, alias="expectedNextNotificationDateTimeFormatted")
     message: str
@@ -73,9 +76,9 @@ class KafkaWeatherResponseDTO(BaseModel):
 
 class SubscriptionUpdateDTO(BaseModel):
     """DTO для обновления подписки"""
-    city_name: Optional[str] = None
-    notification_time: Optional[str] = None
-    time_zone: Optional[str] = None
+    city_name: Optional[str] = Field(None, alias="cityName")
+    notification_time: Optional[str] = Field(None, alias="notificationTime")
+    time_zone: Optional[str] = Field(None, alias="timeZone")
 
     class Config:
         populate_by_name = True

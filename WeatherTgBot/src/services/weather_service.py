@@ -110,7 +110,7 @@ class WeatherService:
         session = await self._get_session()
         
         try:
-            # Фильтруем None значения
+            # Фильтруем None значения и используем by_alias=True для camelCase
             request_data = {k: v for k, v in request.dict(by_alias=True).items() if v is not None}
             
             logger.info(f"Отправка PUT запроса на обновление подписки:")

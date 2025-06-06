@@ -55,9 +55,7 @@ async def process_subscription_city(message: Message, state: FSMContext, weather
             )
             await message.answer(
                 f"✅ Подписка успешно обновлена!\n\n"
-                f"Город: {message.text}\n"
-                f"Время уведомления: {response.notification_time}\n"
-                f"Часовой пояс: {response.time_zone}\n\n"
+                f"Город: {message.text}\n\n"
                 f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
                 reply_markup=get_subscription_menu_keyboard()
             )
@@ -112,9 +110,7 @@ async def process_subscription_time_input(message: Message, state: FSMContext, w
             
             await message.answer(
                 f"✅ Подписка успешно обновлена!\n\n"
-                f"Город: {response.city_name}\n"
-                f"Время уведомления: {time_str}\n"
-                f"Часовой пояс: {response.time_zone}\n\n"
+                f"Время уведомления: {time_str}\n\n"
                 f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
                 reply_markup=get_subscription_menu_keyboard()
             )
@@ -334,8 +330,6 @@ async def process_subscription_timezone(callback: CallbackQuery, state: FSMConte
             )
             await callback.message.edit_text(
                 f"✅ Подписка успешно обновлена!\n\n"
-                f"Город: {response.city_name}\n"
-                f"Время уведомления: {response.notification_time}\n"
                 f"Часовой пояс: {timezone}\n\n"
                 f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
                 reply_markup=get_subscription_menu_keyboard()
