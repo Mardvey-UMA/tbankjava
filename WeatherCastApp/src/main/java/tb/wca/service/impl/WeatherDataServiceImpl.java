@@ -2,6 +2,8 @@ package tb.wca.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tb.wca.entity.CityEntity;
 import tb.wca.entity.CityWeatherEntity;
@@ -22,11 +24,17 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class WeatherDataServiceImpl implements WeatherDataService {
 
+    private static final String WEATHER_CACHE = "weather";
+    private static final String WEATHER_BY_CITY_DATE = "weatherByCityDate";
+    private static final String WEATHER_BY_CITY_DATE_TIME = "weatherByCityDateTime";
+    private static final String WEATHER_BY_CITY_RANGE = "weatherByCityRange";
+
     private final CityWeatherRepository cityWeatherRepository;
     private final WeatherCastRepository weatherCastRepository;
     private final WeatherMapper weatherMapper;
 
     @Override
+    @Cacheable(value = WEATHER_BY_CITY_DATE, key = "#city + '_' + #date.toString()")
     public List<WeatherModel> findByCityAndDate(String city, LocalDate date) {
         return cityWeatherRepository.findByCity_NameAndDate(city, date)
                 .stream()
@@ -35,12 +43,14 @@ public class WeatherDataServiceImpl implements WeatherDataService {
     }
 
     @Override
+    @Cacheable(value = WEATHER_BY_CITY_DATE_TIME, key = "#city + '_' + #date.toString() + '_' + #time.toString()")
     public Optional<WeatherModel> findByCityDateTime(String city, LocalDate date, LocalTime time) {
         return cityWeatherRepository.findByCity_NameAndDateAndTime(city, date, time)
                 .map(weatherMapper::cityWeatherEntityToWeatherModel);
     }
 
     @Override
+    @Cacheable(value = WEATHER_BY_CITY_RANGE, key = "#city + '_' + #start.toString() + '_' + #end.toString()")
     public List<WeatherModel> findByCityAndRange(String city, LocalDate start, LocalDate end) {
         return cityWeatherRepository.findByCity_NameAndDateBetween(city, start, end)
                 .stream()
@@ -50,6 +60,7 @@ public class WeatherDataServiceImpl implements WeatherDataService {
     // TODO Обработать ошибку при сохранении
     @Override
     @Transactional
+    @CacheEvict(value = {WEATHER_BY_CITY_DATE, WEATHER_BY_CITY_DATE_TIME, WEATHER_BY_CITY_RANGE}, allEntries = true)
     public void saveForCityAndDate(CityEntity city, LocalDate date, List<WeatherModel> models) {
         List<WeatherCastEntity> weatherEntities = weatherMapper.modelToEntity(models);
         weatherCastRepository.saveAll(weatherEntities);
@@ -69,6 +80,7 @@ public class WeatherDataServiceImpl implements WeatherDataService {
     // TODO Обработать ошибку при сохранении
     @Override
     @Transactional
+    @CacheEvict(value = {WEATHER_BY_CITY_DATE, WEATHER_BY_CITY_DATE_TIME, WEATHER_BY_CITY_RANGE}, allEntries = true)
     public void saveForCityAndWeatherList(CityEntity city, List<WeatherModel> models) {
         List<WeatherCastEntity> weatherEntities = weatherMapper.modelToEntity(models);
         weatherCastRepository.saveAll(weatherEntities);

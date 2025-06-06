@@ -1,6 +1,7 @@
 package tb.wca.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tb.wca.client.YandexGeocodeClient;
 import tb.wca.entity.CityEntity;
@@ -17,8 +18,10 @@ public class CoordinatesServiceImpl implements CoordinatesService {
     private final CityRepository cityRepository;
     private final CityGeoMapper cityGeoMapper;
     private final YandexGeocodeClient yandexGeocodeClient;
+    private static final String CITIES_CACHE = "cities";
 
     @Override
+    @Cacheable(value = CITIES_CACHE, key = "#cityName")
     public CityGeoModel getCoordinatesByCityName(String cityName) throws CityNotFoundException {
           return cityRepository.findByName(cityName)
                   .map(cityGeoMapper::entityToModel)
@@ -36,6 +39,7 @@ public class CoordinatesServiceImpl implements CoordinatesService {
     }
 
     @Override
+    @Cacheable(value = CITIES_CACHE, key = "#cityName + '_entity'")
     public CityEntity getCoordinatesByCityNameReturnSavedEntity(String cityName) throws CityNotFoundException {
         return cityRepository.findByName(cityName)
                 .orElseGet(() ->{
