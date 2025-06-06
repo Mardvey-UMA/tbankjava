@@ -7,6 +7,4 @@ public interface SubscribeService {
     SubscriptionResponseDTO createSubscribe(SubscriptionRequestDTO subscriptionRequestDTO, Long telegramId);
     SubscriptionResponseDTO deleteSubscribe(Long telegramId);
     SubscriptionResponseDTO updateSubscribe(SubscriptionRequestDTO subscriptionRequestDTO, Long telegramId);
-    SubscriptionResponseDTO activateSubscription(Long telegramId);
-    SubscriptionResponseDTO deactivateSubscription(Long telegramId);
 }

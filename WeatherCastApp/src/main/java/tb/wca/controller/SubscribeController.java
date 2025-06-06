@@ -29,18 +29,6 @@ public class SubscribeController {
         return ResponseEntity.ok(subscribeService.updateSubscribe(request, telegramId));
     }
 
-    @PostMapping("/activate")
-    public ResponseEntity<SubscriptionResponseDTO> activateSubscription(
-            @Valid @RequestHeader("X-Telegram-Id") Long telegramId) {
-        return ResponseEntity.ok(subscribeService.activateSubscription(telegramId));
-    }
-
-    @PostMapping("/deactivate")
-    public ResponseEntity<SubscriptionResponseDTO> deactivateSubscription(
-            @Valid @RequestHeader("X-Telegram-Id") Long telegramId) {
-        return ResponseEntity.ok(subscribeService.deactivateSubscription(telegramId));
-    }
-
     @DeleteMapping
     public ResponseEntity<Void> deleteSubscription(
             @Valid @RequestHeader("X-Telegram-Id") Long telegramId) {

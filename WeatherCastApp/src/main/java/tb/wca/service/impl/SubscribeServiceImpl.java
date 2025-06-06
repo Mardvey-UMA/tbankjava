@@ -1,7 +1,9 @@
 package tb.wca.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tb.wca.dto.SubscriptionRequestDTO;
 import tb.wca.dto.SubscriptionResponseDTO;
 import tb.wca.entity.CityEntity;
@@ -21,6 +23,8 @@ import static tb.wca.util.TimeCalculator.validateTimeZone;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class SubscribeServiceImpl implements SubscribeService {
 
     private final SubscriptionRepository subscriptionRepository;
@@ -52,34 +56,20 @@ public class SubscribeServiceImpl implements SubscribeService {
         return updateSubscription(subscription, request);
     }
 
-    @Override
-    public SubscriptionResponseDTO activateSubscription(Long telegramId) {
-        UserEntity user = getUserOrThrow(telegramId);
-        SubscriptionEntity subscription = getSubscriptionOrThrow(user);
-
-        subscription.setIsActive(true);
-        subscriptionRepository.save(subscription);
-
-        return SubscriptionResponseDTO.of(subscription);
-    }
-
-    @Override
-    public SubscriptionResponseDTO deactivateSubscription(Long telegramId) {
-        UserEntity user = getUserOrThrow(telegramId);
-        SubscriptionEntity subscription = getSubscriptionOrThrow(user);
-
-        subscription.setIsActive(false);
-        subscriptionRepository.save(subscription);
-
-        return SubscriptionResponseDTO.message("Deactivated");
-    }
-
-    @Override
+    @Transactional
     public SubscriptionResponseDTO deleteSubscribe(Long telegramId) {
         UserEntity user = getUserOrThrow(telegramId);
         SubscriptionEntity subscription = getSubscriptionOrThrow(user);
 
-        subscriptionRepository.delete(subscription);
+        if (subscription != null) {
+            user.setSubscription(null);
+            subscription.setUser(null);
+            userRepository.save(user);
+            subscriptionRepository.delete(subscription);
+        }else{
+            throw new SubscriptionNotFoundException(telegramId);
+        }
+
         return SubscriptionResponseDTO.message("Deleted subscription");
     }
 
@@ -108,8 +98,9 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     private SubscriptionEntity getSubscriptionOrThrow(UserEntity user) {
-        return subscriptionRepository.findByUser(user)
-                .orElseThrow(() -> new SubscriptionNotFoundException(user.getTelegramId()));
+//        return subscriptionRepository.findByUser(user)
+//                .orElseThrow(() -> new SubscriptionNotFoundException(user.getTelegramId()));
+          return user.getSubscription();
     }
 
     private CityEntity getCityEntity(String cityName) {
