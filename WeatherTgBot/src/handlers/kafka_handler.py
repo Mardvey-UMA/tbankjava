@@ -30,7 +30,7 @@ class KafkaMessageHandler:
                     f"🌡 Ощущается как: {forecast.feels_like}°C\n"
                     f"💨 Ветер: {forecast.wind_speed} м/с, {forecast.wind_dir}°\n"
                     f"💧 Влажность: {forecast.humidity}%\n"
-                    f"🌪 Давление: {forecast.pressure} мм рт.ст.\n"
+                    f"🌪 Давление: {forecast.pressure} Па\n"
                     f"☀️ УФ-индекс: {forecast.uv_index}\n\n"
                 )
             

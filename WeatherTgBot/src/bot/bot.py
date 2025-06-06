@@ -14,8 +14,6 @@ from src.middleware.error_handler import ErrorHandlerMiddleware
 logger = logging.getLogger(__name__)
 
 class ServiceMiddleware:
-    """Middleware для передачи сервисов в обработчики"""
-    
     def __init__(self, weather_service: WeatherService):
         self.weather_service = weather_service
     
