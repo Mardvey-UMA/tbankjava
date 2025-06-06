@@ -1,9 +1,15 @@
 package tb.wca.exceptions;
 
-public class InvalidCityException extends Exception {
+import lombok.Getter;
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+@Getter
+public class InvalidCityException extends BusinessException {
 
     public InvalidCityException() {
-        super("Город должен содержать только буквы, без цифры и спец символов");
+        super(BusinessErrorCodes.INVALID_CITY);
     }
 
+    public InvalidCityException(String additionalMessage) {
+        super(BusinessErrorCodes.INVALID_CITY, additionalMessage);
+    }
 }

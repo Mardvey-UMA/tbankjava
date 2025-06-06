@@ -1,9 +1,15 @@
 package tb.wca.exceptions;
 
-public class EmptyCityException extends Exception {
+import lombok.Getter;
+import tb.wca.exceptions.enums.BusinessErrorCodes;
+@Getter
+public class EmptyCityException extends BusinessException {
 
     public EmptyCityException() {
-        super("Название города не может быть пустым");
+        super(BusinessErrorCodes.EMPTY_CITY);
     }
 
+    public EmptyCityException(String additionalMessage) {
+        super(BusinessErrorCodes.EMPTY_CITY);
+    }
 }
