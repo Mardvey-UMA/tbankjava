@@ -48,12 +48,7 @@ class KafkaService:
             
         except Exception as e:
             logger.error(f"Ошибка при настройке Schema Registry: {e}")
-            # Создаем десериализатор с пустой схемой
-            self.avro_deserializer = AvroDeserializer(
-                schema_registry_client=None,
-                schema_str='{"type": "record", "name": "WeatherResponseKafkaDTO", "fields": []}'
-            )
-            logger.info("Создан десериализатор с пустой схемой")
+            raise  # Пробрасываем исключение вместо создания десериализатора с пустой схемой
     
     async def _setup_consumer(self):
         """Настройка консьюмера"""
