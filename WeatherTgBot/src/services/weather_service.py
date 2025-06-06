@@ -9,7 +9,8 @@ from src.models.weather import (
     WeatherResponse,
     SubscriptionRequestDTO,
     SubscriptionResponseDTO,
-    WeatherForecast
+    WeatherForecast,
+    SubscriptionUpdateDTO
 )
 
 logger = logging.getLogger(__name__)
@@ -78,31 +79,60 @@ class WeatherService:
         session = await self._get_session()
         
         try:
+            request_data = request.dict(by_alias=True)
+            
+            logger.info(f"Отправка POST запроса на создание подписки:")
+            logger.info(f"URL: {self.base_url}/subscriptions")
+            logger.info(f"Headers: {{'X-Telegram-Id': {telegram_id}}}")
+            logger.info(f"Request data: {request_data}")
+            
             async with session.post(
                 f"{self.base_url}/subscriptions",
-                json=request.dict(by_alias=True),
+                json=request_data,
                 headers={"X-Telegram-Id": str(telegram_id)}
             ) as response:
-                response.raise_for_status()
-                data = await response.json()
-                return SubscriptionResponseDTO.parse_obj(data)
+                response_text = await response.text()
+                logger.info(f"Response status: {response.status}")
+                logger.info(f"Response headers: {response.headers}")
+                logger.info(f"Response body: {response_text}")
+                
+                if response.status == 200:
+                    data = await response.json()
+                    return SubscriptionResponseDTO.parse_obj(data)
+                else:
+                    raise Exception(f"Ошибка API: {response.status} - {response_text}")
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при создании подписки: {e}")
             raise
     
-    async def update_subscription(self, telegram_id: int, request: SubscriptionRequestDTO) -> SubscriptionResponseDTO:
+    async def update_subscription(self, telegram_id: int, request: SubscriptionUpdateDTO) -> SubscriptionResponseDTO:
         """Обновление подписки на прогноз погоды"""
         session = await self._get_session()
         
         try:
+            # Фильтруем None значения
+            request_data = {k: v for k, v in request.dict(by_alias=True).items() if v is not None}
+            
+            logger.info(f"Отправка PUT запроса на обновление подписки:")
+            logger.info(f"URL: {self.base_url}/subscriptions")
+            logger.info(f"Headers: {{'X-Telegram-Id': {telegram_id}}}")
+            logger.info(f"Request data: {request_data}")
+            
             async with session.put(
                 f"{self.base_url}/subscriptions",
-                json=request.dict(by_alias=True),
+                json=request_data,
                 headers={"X-Telegram-Id": str(telegram_id)}
             ) as response:
-                response.raise_for_status()
-                data = await response.json()
-                return SubscriptionResponseDTO.parse_obj(data)
+                response_text = await response.text()
+                logger.info(f"Response status: {response.status}")
+                logger.info(f"Response headers: {response.headers}")
+                logger.info(f"Response body: {response_text}")
+                
+                if response.status == 200:
+                    data = await response.json()
+                    return SubscriptionResponseDTO.parse_obj(data)
+                else:
+                    raise Exception(f"Ошибка API: {response.status} - {response_text}")
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при обновлении подписки: {e}")
             raise
@@ -112,11 +142,21 @@ class WeatherService:
         session = await self._get_session()
         
         try:
+            logger.info(f"Отправка DELETE запроса на удаление подписки:")
+            logger.info(f"URL: {self.base_url}/subscriptions")
+            logger.info(f"Headers: {{'X-Telegram-Id': {telegram_id}}}")
+            
             async with session.delete(
                 f"{self.base_url}/subscriptions",
                 headers={"X-Telegram-Id": str(telegram_id)}
             ) as response:
-                response.raise_for_status()
+                response_text = await response.text()
+                logger.info(f"Response status: {response.status}")
+                logger.info(f"Response headers: {response.headers}")
+                logger.info(f"Response body: {response_text}")
+                
+                if response.status != 200:
+                    raise Exception(f"Ошибка API: {response.status} - {response_text}")
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при удалении подписки: {e}")
             raise
@@ -140,4 +180,31 @@ class WeatherService:
                 logger.info(f"Пользователь {telegram_id} успешно создан")
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при создании пользователя: {e}")
+            raise
+
+    async def get_subscription_info(self, telegram_id: int) -> dict:
+        """Получение информации о текущей подписке"""
+        session = await self._get_session()
+        
+        try:
+            logger.info(f"Отправка GET запроса на получение информации о подписке:")
+            logger.info(f"URL: {self.base_url}/users")
+            logger.info(f"Headers: {{'X-Telegram-Id': {telegram_id}}}")
+            
+            async with session.get(
+                f"{self.base_url}/users",
+                headers={"X-Telegram-Id": str(telegram_id)}
+            ) as response:
+                response_text = await response.text()
+                logger.info(f"Response status: {response.status}")
+                logger.info(f"Response headers: {response.headers}")
+                logger.info(f"Response body: {response_text}")
+                
+                if response.status == 200:
+                    data = await response.json()
+                    return data
+                else:
+                    raise Exception(f"Ошибка API: {response.status} - {response_text}")
+        except aiohttp.ClientError as e:
+            logger.error(f"Ошибка при получении информации о подписке: {e}")
             raise 

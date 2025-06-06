@@ -69,4 +69,20 @@ class SubscriptionResponseDTO(BaseModel):
 
 class KafkaWeatherResponseDTO(BaseModel):
     """Модель для десериализации Kafka сообщений"""
-    forecasts: List[WeatherModel] 
+    forecasts: List[WeatherModel]
+
+class SubscriptionUpdateDTO(BaseModel):
+    """DTO для обновления подписки"""
+    city_name: Optional[str] = None
+    notification_time: Optional[str] = None
+    time_zone: Optional[str] = None
+
+    class Config:
+        populate_by_name = True
+        json_schema_extra = {
+            "example": {
+                "cityName": "Moscow",
+                "notificationTime": "09:30",
+                "timeZone": "Europe/Moscow"
+            }
+        } 

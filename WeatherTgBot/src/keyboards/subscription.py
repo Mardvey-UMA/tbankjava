@@ -10,7 +10,10 @@ def get_subscription_menu_keyboard() -> InlineKeyboardMarkup:
         ],
         [
             InlineKeyboardButton(text="❌ Удалить подписку", callback_data="delete_subscription"),
-            InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_main")
+            InlineKeyboardButton(text="ℹ️ Информация о подписке", callback_data="subscription_info")
+        ],
+        [
+            InlineKeyboardButton(text="◀️ Назад", callback_data="back_to_main")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -20,16 +23,16 @@ def get_timezone_keyboard() -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="Москва (UTC+3)", callback_data="tz_Europe/Moscow"),
-                InlineKeyboardButton(text="Калининград (UTC+2)", callback_data="tz_Europe/Kaliningrad")
+                InlineKeyboardButton(text="Самара (UTC+4)", callback_data="timezone_Europe/Samara"),
+                InlineKeyboardButton(text="Москва (UTC+3)", callback_data="timezone_Europe/Moscow")
             ],
             [
-                InlineKeyboardButton(text="Екатеринбург (UTC+5)", callback_data="tz_Asia/Yekaterinburg"),
-                InlineKeyboardButton(text="Новосибирск (UTC+7)", callback_data="tz_Asia/Novosibirsk")
+                InlineKeyboardButton(text="Екатеринбург (UTC+5)", callback_data="timezone_Asia/Yekaterinburg"),
+                InlineKeyboardButton(text="Новосибирск (UTC+7)", callback_data="timezone_Asia/Novosibirsk")
             ],
             [
-                InlineKeyboardButton(text="Владивосток (UTC+10)", callback_data="tz_Asia/Vladivostok"),
-                InlineKeyboardButton(text="Камчатка (UTC+12)", callback_data="tz_Asia/Kamchatka")
+                InlineKeyboardButton(text="Владивосток (UTC+10)", callback_data="timezone_Asia/Vladivostok"),
+                InlineKeyboardButton(text="Камчатка (UTC+12)", callback_data="timezone_Asia/Kamchatka")
             ],
             [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
         ]
