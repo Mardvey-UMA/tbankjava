@@ -20,9 +20,9 @@ class KafkaMessageHandler:
             message = "🌤 Прогноз погоды:\n\n"
             
             for forecast in weather_data.forecasts:
-                # Преобразуем дату и время в читаемый формат
-                date = datetime.fromtimestamp(forecast.date).strftime("%Y-%m-%d")
-                time = datetime.fromtimestamp(forecast.time / 1000).strftime("%H:%M")
+                # Преобразуем дату в читаемый формат
+                date = forecast.date.strftime("%Y-%m-%d")
+                time = forecast.time.strftime("%H:%M")  # time.strftime работает и для объекта time
                 
                 message += (
                     f"📅 {date} {time}\n"

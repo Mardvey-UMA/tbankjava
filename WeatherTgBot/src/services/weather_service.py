@@ -125,4 +125,19 @@ class WeatherService:
         """Закрытие сессии"""
         if self.session and not self.session.closed:
             logger.info("Закрытие сессии API")
-            await self.session.close() 
+            await self.session.close()
+
+    async def create_user(self, telegram_id: int) -> None:
+        """Создание пользователя"""
+        session = await self._get_session()
+        
+        try:
+            async with session.post(
+                f"{self.base_url}/users",
+                headers={"X-Telegram-Id": str(telegram_id)}
+            ) as response:
+                response.raise_for_status()
+                logger.info(f"Пользователь {telegram_id} успешно создан")
+        except aiohttp.ClientError as e:
+            logger.error(f"Ошибка при создании пользователя: {e}")
+            raise 

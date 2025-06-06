@@ -3,8 +3,9 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 class WeatherModel(BaseModel):
+    """Модель для десериализации данных о погоде из Kafka"""
     date: datetime
-    time: time
+    time: time  # Возвращаем тип time, так как данные приходят в этом формате
     temp: float
     feels_like: float = Field(alias="feelsLike")
     wind_speed: float = Field(alias="windSpeed")
@@ -12,6 +13,9 @@ class WeatherModel(BaseModel):
     humidity: float
     pressure: float
     uv_index: float = Field(alias="uvIndex")
+    
+    class Config:
+        populate_by_name = True
 
 class WeatherResponse(BaseModel):
     forecasts: List[WeatherModel]
