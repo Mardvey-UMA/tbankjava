@@ -35,17 +35,50 @@ async def create_subscription_start(callback: CallbackQuery, state: FSMContext):
     await state.set_state(SubscriptionStates.waiting_for_city)
 
 @router.message(SubscriptionStates.waiting_for_city)
-async def process_subscription_city(message: Message, state: FSMContext):
+async def process_subscription_city(message: Message, state: FSMContext, weather_service: WeatherService):
     """Обработка города для подписки"""
-    await state.update_data(city=message.text)
-    await message.answer(
-        "Выберите время уведомления или введите его вручную в формате ЧЧ:ММ (например, 09:30):",
-        reply_markup=get_time_keyboard()
-    )
-    await state.set_state(SubscriptionStates.waiting_for_time)
+    data = await state.get_data()
+    is_edit = data.get("is_edit", False)
+    
+    try:
+        request = SubscriptionRequestDTO(
+            city_name=message.text,
+            notification_time=data.get("notification_time"),
+            time_zone=data.get("time_zone")
+        )
+        
+        if is_edit:
+            response = await weather_service.update_subscription(
+                message.from_user.id,
+                request
+            )
+            await message.answer(
+                f"✅ Подписка успешно обновлена!\n\n"
+                f"Город: {message.text}\n"
+                f"Время уведомления: {data.get('notification_time')}\n"
+                f"Часовой пояс: {data.get('time_zone')}\n\n"
+                f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
+                reply_markup=get_subscription_menu_keyboard()
+            )
+            await state.clear()
+        else:
+            await state.update_data(city=message.text)
+            await message.answer(
+                "Выберите время уведомления или введите его вручную в формате ЧЧ:ММ (например, 09:30):",
+                reply_markup=get_time_keyboard()
+            )
+            await state.set_state(SubscriptionStates.waiting_for_time)
+    except Exception as e:
+        await message.answer(
+            "😔 Произошла ошибка при обновлении подписки. "
+            "Пожалуйста, попробуйте позже или обратитесь в поддержку.",
+            reply_markup=get_subscription_menu_keyboard()
+        )
+        await state.clear()
+        raise
 
 @router.message(SubscriptionStates.waiting_for_time)
-async def process_subscription_time_input(message: Message, state: FSMContext):
+async def process_subscription_time_input(message: Message, state: FSMContext, weather_service: WeatherService):
     """Обработка ручного ввода времени для подписки"""
     try:
         # Проверяем формат времени
@@ -63,47 +96,93 @@ async def process_subscription_time_input(message: Message, state: FSMContext):
             )
             return
         
-        await state.update_data(notification_time=time_str)
-        await message.answer(
-            "Выберите часовой пояс или введите его вручную (например, Europe/Moscow):",
-            reply_markup=get_timezone_keyboard()
-        )
-        await state.set_state(SubscriptionStates.waiting_for_timezone)
+        data = await state.get_data()
+        is_edit = data.get("is_edit", False)
+        
+        if is_edit:
+            request = SubscriptionRequestDTO(
+                city_name=data.get("city"),
+                notification_time=time_str,
+                time_zone=data.get("time_zone")
+            )
+            
+            response = await weather_service.update_subscription(
+                message.from_user.id,
+                request
+            )
+            
+            await message.answer(
+                f"✅ Подписка успешно обновлена!\n\n"
+                f"Город: {data.get('city')}\n"
+                f"Время уведомления: {time_str}\n"
+                f"Часовой пояс: {data.get('time_zone')}\n\n"
+                f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
+                reply_markup=get_subscription_menu_keyboard()
+            )
+            await state.clear()
+        else:
+            await state.update_data(notification_time=time_str)
+            await message.answer(
+                "Выберите часовой пояс или введите его вручную (например, Europe/Moscow):",
+                reply_markup=get_timezone_keyboard()
+            )
+            await state.set_state(SubscriptionStates.waiting_for_timezone)
     except ValueError:
         await message.answer(
             "❌ Неверный формат времени. Пожалуйста, используйте формат ЧЧ:ММ (например, 09:30):"
         )
+    except Exception as e:
+        await message.answer(
+            "😔 Произошла ошибка при обновлении подписки. "
+            "Пожалуйста, попробуйте позже или обратитесь в поддержку.",
+            reply_markup=get_subscription_menu_keyboard()
+        )
+        await state.clear()
+        raise
 
 @router.message(SubscriptionStates.waiting_for_timezone)
 async def process_subscription_timezone_input(message: Message, state: FSMContext, weather_service: WeatherService):
-    """Обработка ручного ввода часового пояса и создание подписки"""
+    """Обработка ручного ввода часового пояса и создание/обновление подписки"""
     timezone = message.text.strip()
     data = await state.get_data()
     
     try:
         request = SubscriptionRequestDTO(
-            city_name=data["city"],
-            notification_time=data["notification_time"],
+            city_name=data.get("city"),
+            notification_time=data.get("notification_time"),
             time_zone=timezone
         )
         
-        response = await weather_service.create_subscription(
-            message.from_user.id,
-            request
-        )
-        
-        await message.answer(
-            f"✅ Подписка успешно создана!\n\n"
-            f"Город: {data['city']}\n"
-            f"Время уведомления: {data['notification_time']}\n"
-            f"Часовой пояс: {timezone}\n\n"
-            f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
-            reply_markup=get_subscription_menu_keyboard()
-        )
+        if data.get("is_edit", False):
+            response = await weather_service.update_subscription(
+                message.from_user.id,
+                request
+            )
+            await message.answer(
+                f"✅ Подписка успешно обновлена!\n\n"
+                f"Город: {data.get('city')}\n"
+                f"Время уведомления: {data.get('notification_time')}\n"
+                f"Часовой пояс: {timezone}\n\n"
+                f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
+                reply_markup=get_subscription_menu_keyboard()
+            )
+        else:
+            response = await weather_service.create_subscription(
+                message.from_user.id,
+                request
+            )
+            await message.answer(
+                f"✅ Подписка успешно создана!\n\n"
+                f"Город: {data.get('city')}\n"
+                f"Время уведомления: {data.get('notification_time')}\n"
+                f"Часовой пояс: {timezone}\n\n"
+                f"Следующее уведомление: {response.expected_next_notification_date_time_formatted.strftime('%Y-%m-%d %H:%M')}",
+                reply_markup=get_subscription_menu_keyboard()
+            )
         
     except Exception as e:
         await message.answer(
-            "😔 Произошла ошибка при создании подписки. "
+            "😔 Произошла ошибка при обновлении подписки. "
             "Пожалуйста, попробуйте позже или обратитесь в поддержку.",
             reply_markup=get_subscription_menu_keyboard()
         )
@@ -122,6 +201,7 @@ async def edit_subscription_start(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "edit_city")
 async def edit_subscription_city(callback: CallbackQuery, state: FSMContext):
     """Редактирование города подписки"""
+    await state.update_data(is_edit=True)
     await callback.message.edit_text(
         "Введите новое название города:",
         reply_markup=None
@@ -131,6 +211,7 @@ async def edit_subscription_city(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "edit_time")
 async def edit_subscription_time(callback: CallbackQuery, state: FSMContext):
     """Редактирование времени подписки"""
+    await state.update_data(is_edit=True)
     await callback.message.edit_text(
         "Выберите новое время уведомления или введите его вручную в формате ЧЧ:ММ (например, 09:30):",
         reply_markup=get_time_keyboard()
@@ -140,6 +221,7 @@ async def edit_subscription_time(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "edit_timezone")
 async def edit_subscription_timezone(callback: CallbackQuery, state: FSMContext):
     """Редактирование часового пояса подписки"""
+    await state.update_data(is_edit=True)
     await callback.message.edit_text(
         "Выберите новый часовой пояс или введите его вручную (например, Europe/Moscow):",
         reply_markup=get_timezone_keyboard()
