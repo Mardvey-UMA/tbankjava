@@ -25,7 +25,7 @@ public class SubscribeController {
     @PutMapping
     public ResponseEntity<SubscriptionResponseDTO> updateSubscription(
             @RequestHeader("X-Telegram-Id") Long telegramId,
-            @Valid @RequestBody SubscriptionRequestDTO request) {
+            @RequestBody SubscriptionRequestDTO request) {
         return ResponseEntity.ok(subscribeService.updateSubscribe(request, telegramId));
     }
 
