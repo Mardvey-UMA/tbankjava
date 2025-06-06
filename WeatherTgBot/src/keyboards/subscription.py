@@ -3,15 +3,17 @@ from datetime import time
 
 def get_subscription_menu_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура меню подписок"""
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="➕ Создать подписку", callback_data="create_subscription")],
-            [InlineKeyboardButton(text="✏️ Изменить подписку", callback_data="edit_subscription")],
-            [InlineKeyboardButton(text="❌ Удалить подписку", callback_data="delete_subscription")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_main")]
+    keyboard = [
+        [
+            InlineKeyboardButton(text="➕ Создать подписку", callback_data="create_subscription"),
+            InlineKeyboardButton(text="✏️ Изменить подписку", callback_data="edit_subscription")
+        ],
+        [
+            InlineKeyboardButton(text="❌ Удалить подписку", callback_data="delete_subscription"),
+            InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_main")
         ]
-    )
-    return keyboard
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 def get_timezone_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура выбора часового пояса"""
@@ -56,4 +58,21 @@ def get_time_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")]
         ]
     )
-    return keyboard 
+    return keyboard
+
+def get_edit_subscription_keyboard() -> InlineKeyboardMarkup:
+    """Клавиатура редактирования подписки"""
+    keyboard = [
+        [
+            InlineKeyboardButton(text="🏙 Изменить город", callback_data="edit_city"),
+            InlineKeyboardButton(text="🕒 Изменить время", callback_data="edit_time")
+        ],
+        [
+            InlineKeyboardButton(text="🌍 Изменить часовой пояс", callback_data="edit_timezone"),
+            InlineKeyboardButton(text="⏭ Не изменять", callback_data="skip_edit")
+        ],
+        [
+            InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_subscription")
+        ]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard) 

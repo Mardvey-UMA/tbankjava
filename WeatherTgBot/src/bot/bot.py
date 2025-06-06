@@ -8,6 +8,7 @@ from src.config.config import Config
 from src.services.weather_service import WeatherService
 from src.services.kafka_service import KafkaService
 from src.handlers import start, weather, subscription
+from src.handlers.kafka_handler import KafkaMessageHandler
 from src.middleware.error_handler import ErrorHandlerMiddleware
 
 logger = logging.getLogger(__name__)
@@ -38,18 +39,22 @@ class WeatherBot:
         # Инициализируем сервисы
         self.weather_service = WeatherService(config)
         self.kafka_service = KafkaService(config)
+        self.kafka_handler = KafkaMessageHandler(self.bot)
         
         # Регистрируем обработчики
         self._setup_handlers()
         
         # Регистрируем middleware
         self._setup_middleware()
+        
+        logger.info("WeatherBot инициализирован")
     
     def _setup_handlers(self):
         """Регистрация обработчиков"""
         self.dp.include_router(start.router)
         self.dp.include_router(weather.router)
         self.dp.include_router(subscription.router)
+        logger.info("Обработчики зарегистрированы")
     
     def _setup_middleware(self):
         """Регистрация middleware"""
@@ -61,61 +66,59 @@ class WeatherBot:
         service_middleware = ServiceMiddleware(self.weather_service)
         self.dp.message.middleware(service_middleware)
         self.dp.callback_query.middleware(service_middleware)
+        logger.info("Middleware зарегистрированы")
     
-    async def _handle_kafka_message(self, message: dict):
-        """Обработка сообщений из Kafka"""
+    async def _initialize_kafka(self):
+        """Асинхронная инициализация Kafka"""
+        logger.info("Начинаем инициализацию Kafka")
         try:
-            # Получаем данные из сообщения
-            user_id = message.get('userId')
-            forecast = message.get('forecast')
-            
-            if not user_id or not forecast:
-                logger.error(f"Некорректное сообщение: {message}")
-                return
-            
-            # Форматируем прогноз
-            forecast_text = (
-                f"🌤 Прогноз погоды для {forecast.get('cityName')}:\n\n"
-                f"📅 Дата: {forecast.get('date')}\n"
-                f"⏰ Время: {forecast.get('time')}\n"
-                f"🌡 Температура: {forecast.get('temp')}°C\n"
-                f"🌡 Ощущается как: {forecast.get('feelsLike')}°C\n"
-                f"💨 Ветер: {forecast.get('windSpeed')} м/с\n"
-                f"💧 Влажность: {forecast.get('humidity')}%\n"
-                f"🌪 Давление: {forecast.get('pressure')} мм рт.ст.\n"
-                f"☀️ УФ-индекс: {forecast.get('uvIndex')}"
+            await self.kafka_service.initialize()
+            kafka_task = asyncio.create_task(
+                self.kafka_service.start(self.kafka_handler.handle_message)
             )
-            
-            # Отправляем прогноз пользователю
-            await self.bot.send_message(user_id, forecast_text)
-            
+            logger.info("Kafka успешно инициализирована")
+            return kafka_task
         except Exception as e:
-            logger.error(f"Ошибка при обработке сообщения из Kafka: {e}")
+            logger.error(f"Ошибка при инициализации Kafka: {e}")
+            return None
     
     async def start(self):
         """Запуск бота"""
+        kafka_task = None
         try:
-            # Временно отключаем обработку сообщений из Kafka
-            # kafka_task = asyncio.create_task(
-            #     self.kafka_service.start(self._handle_kafka_message)
-            # )
-            
             # Запускаем бота
-            await self.dp.start_polling(self.bot)
+            logger.info("Запуск бота")
+            polling_task = asyncio.create_task(
+                self.dp.start_polling(self.bot)
+            )
+            
+            # Инициализируем Kafka в фоновом режиме
+            kafka_task = await self._initialize_kafka()
+            
+            # Ждем завершения работы бота
+            await polling_task
             
         except Exception as e:
             logger.error(f"Ошибка при запуске бота: {e}")
             raise
         finally:
             # Останавливаем обработку сообщений из Kafka
-            # self.kafka_service.stop()
-            # await kafka_task
-            pass
+            if kafka_task:
+                logger.info("Останавливаем Kafka")
+                self.kafka_service.stop()
+                try:
+                    await asyncio.wait_for(kafka_task, timeout=5.0)
+                except asyncio.TimeoutError:
+                    logger.error("Таймаут при остановке Kafka сервиса")
+                except Exception as e:
+                    logger.error(f"Ошибка при остановке Kafka сервиса: {e}")
     
     async def stop(self):
         """Остановка бота"""
+        logger.info("Остановка бота")
         await self.bot.session.close()
         await self.weather_service.close()
+        logger.info("Бот остановлен")
 
 def run_bot(config: Config):
     bot = WeatherBot(config)

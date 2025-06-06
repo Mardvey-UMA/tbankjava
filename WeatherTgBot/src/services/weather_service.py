@@ -7,8 +7,8 @@ from src.config.config import Config
 from src.models.weather import (
     WeatherRequest,
     WeatherResponse,
-    SubscriptionRequest,
-    SubscriptionResponse,
+    SubscriptionRequestDTO,
+    SubscriptionResponseDTO,
     WeatherForecast
 )
 
@@ -19,7 +19,7 @@ class WeatherService:
     
     def __init__(self, config: Config):
         self.config = config
-        self.base_url = config.api.base_url
+        self.base_url = config.api.base_url.rstrip('/')  # Убираем trailing slash
         self.session: Optional[aiohttp.ClientSession] = None
     
     async def _get_session(self) -> aiohttp.ClientSession:
@@ -73,32 +73,49 @@ class WeatherService:
             logger.error(f"Ошибка при запросе к API: {str(e)}")
             raise
     
-    async def create_subscription(self, request: SubscriptionRequest) -> SubscriptionResponse:
+    async def create_subscription(self, telegram_id: int, request: SubscriptionRequestDTO) -> SubscriptionResponseDTO:
         """Создание подписки на прогноз погоды"""
         session = await self._get_session()
         
-        data = {
-            "userId": request.user_id,
-            "cityName": request.city_name,
-            "notificationTime": request.notification_time.strftime("%H:%M"),
-            "timeZone": request.timezone
-        }
-        
         try:
-            async with session.post(f"{self.base_url}/subscriptions", json=data) as response:
+            async with session.post(
+                f"{self.base_url}/subscriptions",
+                json=request.dict(by_alias=True),
+                headers={"X-Telegram-Id": str(telegram_id)}
+            ) as response:
                 response.raise_for_status()
                 data = await response.json()
-                return SubscriptionResponse(**data)
+                return SubscriptionResponseDTO.parse_obj(data)
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при создании подписки: {e}")
             raise
     
-    async def delete_subscription(self, subscription_id: str) -> None:
+    async def update_subscription(self, telegram_id: int, request: SubscriptionRequestDTO) -> SubscriptionResponseDTO:
+        """Обновление подписки на прогноз погоды"""
+        session = await self._get_session()
+        
+        try:
+            async with session.put(
+                f"{self.base_url}/subscriptions",
+                json=request.dict(by_alias=True),
+                headers={"X-Telegram-Id": str(telegram_id)}
+            ) as response:
+                response.raise_for_status()
+                data = await response.json()
+                return SubscriptionResponseDTO.parse_obj(data)
+        except aiohttp.ClientError as e:
+            logger.error(f"Ошибка при обновлении подписки: {e}")
+            raise
+    
+    async def delete_subscription(self, telegram_id: int) -> None:
         """Удаление подписки на прогноз погоды"""
         session = await self._get_session()
         
         try:
-            async with session.delete(f"{self.base_url}/subscriptions/{subscription_id}") as response:
+            async with session.delete(
+                f"{self.base_url}/subscriptions",
+                headers={"X-Telegram-Id": str(telegram_id)}
+            ) as response:
                 response.raise_for_status()
         except aiohttp.ClientError as e:
             logger.error(f"Ошибка при удалении подписки: {e}")

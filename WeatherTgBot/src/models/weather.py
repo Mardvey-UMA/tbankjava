@@ -45,23 +45,24 @@ class WeatherResponse(BaseModel):
     """Модель ответа с прогнозом погоды"""
     forecasts: List[WeatherForecast]
 
-class SubscriptionRequest(BaseModel):
-    """Модель запроса на создание подписки"""
-    user_id: int = Field(alias="userId")
+class SubscriptionRequestDTO(BaseModel):
+    """Модель запроса на создание/обновление подписки"""
     city_name: str = Field(alias="cityName")
-    notification_time: time = Field(alias="notificationTime")
-    timezone: str
+    notification_time: Optional[str] = Field(None, alias="notificationTime", pattern=r"^([01]?[0-9]|2[0-3]):[0-5][0-9]$")
+    time_zone: Optional[str] = Field(None, alias="timeZone")
     
     class Config:
         populate_by_name = True
 
-class SubscriptionResponse(BaseModel):
+class SubscriptionResponseDTO(BaseModel):
     """Модель ответа с информацией о подписке"""
-    subscription_id: str = Field(alias="subscriptionId")
-    user_id: int = Field(alias="userId")
-    city_name: str = Field(alias="cityName")
-    notification_time: time = Field(alias="notificationTime")
-    timezone: str
+    expected_next_notification_date_time: Optional[datetime] = Field(None, alias="expectedNextNotificationDateTime")
+    expected_next_notification_date_time_formatted: Optional[datetime] = Field(None, alias="expectedNextNotificationDateTimeFormatted")
+    message: str
     
     class Config:
-        populate_by_name = True 
+        populate_by_name = True
+
+class KafkaWeatherResponseDTO(BaseModel):
+    """Модель для десериализации Kafka сообщений"""
+    forecasts: List[WeatherModel] 
