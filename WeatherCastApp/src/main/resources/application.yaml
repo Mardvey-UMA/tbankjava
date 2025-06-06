@@ -1,0 +1,70 @@
+spring:
+  cache:
+    type: redis
+    redis:
+      host: redis
+      port: 6379
+      password:
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  kafka:
+    bootstrap-servers: kafka:9092
+    topics:
+      subscription-request: subscription-requests
+      subscription-response: subscription-responses
+      weather-request: weather-requests
+      weather-response: weather-responses
+
+    properties:
+      schema.registry.url: http://schema-registry:8081
+      specific.avro.reader: true
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      group-id: weather-app
+      auto-offset-reset: earliest
+
+
+
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 1
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/weather_service_db
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+api-keys:
+  weather: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4MzMxOTYwLCJpYXQiOjE3NDgzMzE2NjAsImp0aSI6ImY3NWFiN2VlMzJiYTQxNDE5Y2Q4ZDYxYzA3MmU1NjFjIiwidXNlcl9pZCI6MTAxNX0.hBeqIZVrcpsqRiCZ-IuxIx_C6lQzatyaD6Y7je65bSc
+  city: 00c87056-218c-4064-9f7f-a5c3804b1087
+
+clients:
+  yandex-geocode:
+    url: https://geocode-maps.yandex.ru/v1
+  weather:
+    url: https://projecteol.ru/api/weather
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: FULL
+logging:
+  level:
+    feign: DEBUG

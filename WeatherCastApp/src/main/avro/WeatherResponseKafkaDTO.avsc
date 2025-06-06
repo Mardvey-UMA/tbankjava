@@ -1,0 +1,35 @@
+{
+  "namespace": "tb.wca.avro",
+  "type": "record",
+  "name": "WeatherResponseKafkaDTO",
+  "fields": [
+    {
+      "name": "forecasts",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "WeatherModelForResponseKafkaDTO",
+          "type": "record",
+          "fields": [
+            {
+              "name": "date",
+              "type": { "type": "int", "logicalType": "date" }
+            },
+            {
+              "name": "time",
+              "type": { "type": "int", "logicalType": "time-millis" }
+            },
+
+            { "name": "temp",      "type": "double" },
+            { "name": "feelsLike", "type": "double" },
+            { "name": "windSpeed", "type": "double" },
+            { "name": "windDir",   "type": "double" },
+            { "name": "humidity",  "type": "double" },
+            { "name": "pressure",  "type": "double" },
+            { "name": "uvIndex",   "type": "double" }
+          ]
+        }
+      }
+    }
+  ]
+}
